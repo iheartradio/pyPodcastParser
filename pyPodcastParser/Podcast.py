@@ -167,6 +167,7 @@ class Podcast():
     def set_itunes(self):
         """Sets elements related to itunes"""
         self.set_itunes_author_name()
+        self.set_itunes_type()
         self.set_itunes_block()
         self.set_itunes_complete()
         self.set_itunes_explicit()
@@ -292,6 +293,13 @@ class Podcast():
             self.itunes_author_name = self.soup.find('itunes:author').string
         except AttributeError:
             self.itunes_author_name = None
+
+    def set_itunes_type(self):
+        """Parses the type of show and sets value"""
+        try:
+            self.itunes_type = self.soup.find('itunes:type').string
+        except AttributeError:
+            self.itunes_type = None
 
     def set_itunes_block(self):
         """Check and see if podcast is blocked from iTunes and sets value"""
