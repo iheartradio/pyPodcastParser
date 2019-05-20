@@ -190,6 +190,9 @@ class Item(object):
     def set_itunes_element(self):
         """Set each of the itunes elements."""
         self.set_itunes_author_name()
+        self.set_itunes_episode()
+        self.set_itunes_season()
+        self.set_itunes_episode_type()
         self.set_itunes_block()
         self.set_itunes_closed_captioned()
         self.set_itunes_duration()
@@ -205,6 +208,27 @@ class Item(object):
             self.itunes_author_name = self.soup.find('itunes:author').string
         except AttributeError:
             self.itunes_author_name = None
+
+    def set_itunes_episode(self):
+        """Parses the episode number and sets value"""
+        try:
+            self.itunes_episode = self.soup.find('itunes:episode').string
+        except AttributeError:
+            self.itunes_episode = None
+
+    def set_itunes_season(self):
+        """Parses the episode season and sets value"""
+        try:
+            self.itunes_season = self.soup.find('itunes:season').string
+        except AttributeError:
+            self.itunes_season = None
+
+    def set_itunes_episode_type(self):
+        """Parses the episode type and sets value"""
+        try:
+            self.itunes_episode_type = self.soup.find('itunes:episodeType').string
+        except AttributeError:
+            self.itunes_episode_type = None
 
     def set_itunes_block(self):
         """Check and see if item is blocked from iTunes and sets value"""
