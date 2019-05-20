@@ -154,6 +154,7 @@ class Podcast():
         podcast_dict['subtitle'] = self.subtitle
         podcast_dict['title'] = self.title
         podcast_dict['ttl'] = self.ttl
+        podcast_dict['type'] = self.type
         podcast_dict['web_master'] = self.web_master
         return podcast_dict
 

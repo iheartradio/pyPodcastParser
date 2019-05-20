@@ -84,6 +84,9 @@ class Item(object):
         item['itunes_closed_captioned'] = self.itunes_closed_captioned
         item['itunes_duration'] = self.itunes_duration
         item['itunes_explicit'] = self.itunes_explicit
+        item['itunes_episode'] = self.itunes_episode
+        item['itunes_season'] = self.itunes_season
+        item['itunes_episode_type'] = self.itunes_episode_type
         item['itune_image'] = self.itune_image
         item['itunes_order'] = self.itunes_order
         item['itunes_subtitle'] = self.itunes_subtitle
