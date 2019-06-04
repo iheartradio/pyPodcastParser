@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 import email.utils
 from time import mktime
 
@@ -59,16 +59,11 @@ class Item(object):
             self.time_published = None
 
     def set_dates_published(self):
-        if self.published_date is None:
+        if self.time_published is None:
             self.date_time = None
             return
         time_tuple = email.utils.parsedate(self.published_date)
-        try:
-            temp_datetime = datetime(time_tuple[0], time_tuple[1], time_tuple[2])
-        except TypeError:
-            self.date_time = None
-            return
-        self.date_time = temp_datetime
+        self.date_time = date.fromtimestamp(self.time_published)
 
     def to_dict(self):
         item = {}

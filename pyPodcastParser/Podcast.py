@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, date
 import email.utils
 from time import mktime
 
@@ -91,12 +91,10 @@ class Podcast():
         self.time_published = email.utils.mktime_tz(time_tuple)
 
     def set_dates_published(self):
-        if self.published_date is None:
+        if self.time_published is None:
             self.date_time = None
         else:
-            time_tuple = email.utils.parsedate(self.published_date)
-            temp_datetime = datetime(time_tuple[0], time_tuple[1], time_tuple[2])
-            self.date_time = temp_datetime
+            self.date_time = date.fromtimestamp(self.time_published)
 
     def set_validity(self):
         self.set_is_valid_rss()
