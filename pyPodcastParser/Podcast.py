@@ -74,11 +74,13 @@ class Podcast():
         self.last_build_date = None
         self.link = None
         self.published_date = None
+        self.summary = None
         self.owner_name = None
         self.owner_email = None
         self.subtitle = None
         self.title = None
         self.date_time = None
+        self.itunes_type = None
 
         self.set_soup()
         tag_methods = {
