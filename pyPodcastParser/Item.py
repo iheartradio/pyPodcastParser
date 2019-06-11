@@ -23,6 +23,9 @@ class Item(object):
         enclosure_length (int): File size in bytes
         guid (str): globally unique identifier
         itunes_author_name (str): Author name given to iTunes
+        itunes_episode_type (srt): Itunes episode type
+        itunes_episode (int): Episode number in season
+        itunes_season (int): Podcast season
         itunes_block (bool): It this Item blocked from itunes
         itunes_duration (str): Duration of enclosure
         itunes_explicit (str): Is this item explicit. Should only be yes or clean.
@@ -30,6 +33,7 @@ class Item(object):
         itunes_order (str): Override published_date order
         itunes_subtitle (str): The item subtitle
         itunes_summary (str): The summary of the item
+        content_encoded(str): The encoded content of the item
         published_date (str): Date item was published
         title (str): The title of item.
         date_time (datetime): When published
@@ -44,10 +48,14 @@ class Item(object):
         self.enclosure_url = None
         self.enclosure_type = None
         self.enclosure_length = None
+        self.content_encoded = None
         self.guid = None
         self.itunes_author_name = None
+        self.itunes_episode_type = None
         self.itunes_block = False
         self.itunes_duration = None
+        self.itunes_season = None
+        self.itunes_episode = None
         self.itunes_explicit = None
         self.itunes_image = None
         self.itunes_order = None
