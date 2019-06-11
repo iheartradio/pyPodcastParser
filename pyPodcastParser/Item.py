@@ -1,6 +1,7 @@
 from datetime import datetime, date
 import email.utils
 from time import mktime
+from bs4 import Tag
 
 class Item(object):
     """Parses an xml rss feed
@@ -16,8 +17,6 @@ class Item(object):
 
     Attributes:
         author (str): The author of the item
-        comments (str): URL of comments
-        creative_commons (str): creative commons license for this item
         description (str): Description of the item.
         enclosure_url (str): URL of enclosure
         enclosure_type (str): File MIME type
@@ -25,25 +24,71 @@ class Item(object):
         guid (str): globally unique identifier
         itunes_author_name (str): Author name given to iTunes
         itunes_block (bool): It this Item blocked from itunes
-        itunes_closed_captioned: (str): It is this item have closed captions
         itunes_duration (str): Duration of enclosure
         itunes_explicit (str): Is this item explicit. Should only be yes or clean.
-        itune_image (str): URL of item cover art
+        itunes_image (str): URL of item cover art
         itunes_order (str): Override published_date order
         itunes_subtitle (str): The item subtitle
         itunes_summary (str): The summary of the item
-        link (str): The URL of item.
         published_date (str): Date item was published
         title (str): The title of item.
         date_time (datetime): When published
     """
 
     def __init__(self, soup):
-        #super(Item, self).__init__()
-
         self.soup = soup
-        self.set_rss_element()
-        self.set_itunes_element()
+
+        # Initialize attributes as they might not be populated
+        self.author = None
+        self.description = None
+        self.enclosure_url = None
+        self.enclosure_type = None
+        self.enclosure_length = None
+        self.guid = None
+        self.itunes_author_name = None
+        self.itunes_block = None
+        self.itunes_duration = None
+        self.itunes_explicit = None
+        self.itunes_image = None
+        self.itunes_order = None
+        self.itunes_subtitle = None
+        self.itunes_summary = None
+        self.published_date = None
+        self.title = None
+        self.date_time = None
+
+        tag_methods = {
+            (None, 'title'): self.set_title,
+            (None, 'author'): self.set_author,
+            (None, 'description'): self.set_description,
+            (None, 'content:encoded'): self.set_content_encoded,
+            (None, 'guid'): self.set_guid,
+            (None, 'pubDate'): self.set_published_date,
+            (None, 'enclosure'): self.set_enclosure,
+            ('itunes', 'author'): self.set_itunes_author_name,
+            ('itunes', 'episode'): self.set_itunes_episode,
+            ('itunes', 'episodeType'): self.set_itunes_episode_type,
+            ('itunes', 'block'): self.set_itunes_block,
+            ('itunes', 'season'): self.set_itunes_season,
+            ('itunes', 'duration'): self.set_itunes_duration,
+            ('itunes', 'explicit'): self.set_itunes_explicit,
+            ('itunes', 'image'): self.set_itunes_image,
+            ('itunes', 'order'): self.set_itunes_order,
+            ('itunes', 'subtitle'): self.set_itunes_subtitle,
+            ('itunes', 'summary'): self.set_itunes_summary,
+        }
+
+        # Populate attributes based on feed content
+        for c in self.soup.children:
+            if not isinstance(c, Tag):
+                continue
+            try:
+                # Pop method to skip duplicated tag on invalid feeds
+                tag_method = tag_methods.pop((c.prefix, c.name))
+            except (AttributeError, KeyError):
+                continue
+
+            tag_method(c)
 
         self.set_time_published()
         self.set_dates_published()
@@ -68,8 +113,6 @@ class Item(object):
     def to_dict(self):
         item = {}
         item['author'] = self.author
-        item['comments'] = self.comments
-        item['creative_commons'] = self.creative_commons
         item['enclosure_url'] = self.enclosure_url
         item['enclosure_type'] = self.enclosure_type
         item['enclosure_length'] = self.enclosure_length
@@ -77,172 +120,115 @@ class Item(object):
         item['guid'] = self.guid
         item['itunes_author_name'] = self.itunes_author_name
         item['itunes_block'] = self.itunes_block
-        item['itunes_closed_captioned'] = self.itunes_closed_captioned
         item['itunes_duration'] = self.itunes_duration
         item['itunes_explicit'] = self.itunes_explicit
         item['itunes_episode'] = self.itunes_episode
         item['itunes_season'] = self.itunes_season
         item['itunes_episode_type'] = self.itunes_episode_type
-        item['itune_image'] = self.itune_image
+        item['itunes_image'] = self.itunes_image
         item['itunes_order'] = self.itunes_order
         item['itunes_subtitle'] = self.itunes_subtitle
         item['itunes_summary'] = self.itunes_summary
         item['content_encoded'] = self.content_encoded
         item['description'] = self.description
-        item['link'] = self.link
         item['published_date'] = self.published_date
         item['title'] = self.title
         return item
 
     def set_rss_element(self):
         """Set each of the basic rss elements."""
-        self.set_author()
-        self.set_categories()
-        self.set_comments()
-        self.set_creative_commons()
-        self.set_description()
-        self.set_content_encoded()
         self.set_enclosure()
-        self.set_guid()
-        self.set_link()
-        self.set_published_date()
-        self.set_title()
 
-    def set_author(self):
+    def set_author(self, tag):
         """Parses author and set value."""
         try:
-            self.author = self.soup.find('author').string
+            self.author = tag.string
         except AttributeError:
             self.author = None
 
-    def set_categories(self):
-        """Parses and set categories"""
-        self.categories = []
-        temp_categories = self.soup.findAll('category')
-        for category in temp_categories:
-            category_text = category.string
-            self.categories.append(category_text)
-
-    def set_comments(self):
-        """Parses comments and set value."""
-        try:
-            self.comments = self.soup.find('comments').string
-        except AttributeError:
-            self.comments = None
-
-    def set_creative_commons(self):
-        """Parses creative commons for item and sets value"""
-        try:
-            self.creative_commons = self.soup.find(
-                'creativecommons:license').string
-        except AttributeError:
-            self.creative_commons = None
-
-    def set_description(self):
+    def set_description(self, tag):
         """Parses description and set value."""
         try:
-            self.description = self.soup.find('description').string
+            self.description = tag.string
         except AttributeError:
             self.description = None
 
-    def set_content_encoded(self):
+    def set_content_encoded(self, tag):
         """Parses content_encoded and set value."""
         try:
-            self.content_encoded = self.soup.find('content:encoded').string
+            self.content_encoded = tag.string
         except AttributeError:
             self.content_encoded = None
 
-    def set_enclosure(self):
+    def set_enclosure(self, tag):
         """Parses enclosure_url, enclosure_type then set values."""
         try:
-            self.enclosure_url = self.soup.find('enclosure')['url']
+            self.enclosure_url = tag['url']
         except:
             self.enclosure_url = None
         try:
-            self.enclosure_type = self.soup.find('enclosure')['type']
+            self.enclosure_type = tag['type']
         except:
             self.enclosure_type = None
         try:
-            self.enclosure_length = self.soup.find('enclosure')['length']
+            self.enclosure_length = tag['length']
             self.enclosure_length = int(self.enclosure_length)
         except:
             self.enclosure_length = None
 
-    def set_guid(self):
+    def set_guid(self, tag):
         """Parses guid and set value"""
         try:
-            self.guid = self.soup.find('guid').string
+            self.guid = tag.string
         except AttributeError:
             self.guid = None
 
-    def set_link(self):
-        """Parses link and set value."""
-        try:
-            self.link = self.soup.find('link').string
-        except AttributeError:
-            self.link = None
-
-    def set_published_date(self):
+    def set_published_date(self, tag):
         """Parses published date and set value."""
         try:
-            self.published_date = self.soup.find('pubdate').string
+            self.published_date = tag.string
         except AttributeError:
             self.published_date = None
 
-    def set_title(self):
+    def set_title(self, tag):
         """Parses title and set value."""
         try:
-            self.title = self.soup.find('title').string
+            self.title = tag.string
         except AttributeError:
             self.title = None
 
-    def set_itunes_element(self):
-        """Set each of the itunes elements."""
-        self.set_itunes_author_name()
-        self.set_itunes_episode()
-        self.set_itunes_season()
-        self.set_itunes_episode_type()
-        self.set_itunes_block()
-        self.set_itunes_closed_captioned()
-        self.set_itunes_duration()
-        self.set_itunes_explicit()
-        self.set_itune_image()
-        self.set_itunes_order()
-        self.set_itunes_subtitle()
-        self.set_itunes_summary()
-
-    def set_itunes_author_name(self):
+    def set_itunes_author_name(self, tag):
         """Parses author name from itunes tags and sets value"""
         try:
-            self.itunes_author_name = self.soup.find('itunes:author').string
+            self.itunes_author_name = tag.string
         except AttributeError:
             self.itunes_author_name = None
 
-    def set_itunes_episode(self):
+    def set_itunes_episode(self, tag):
         """Parses the episode number and sets value"""
         try:
-            self.itunes_episode = self.soup.find('itunes:episode').string
+            self.itunes_episode = tag.string
         except AttributeError:
             self.itunes_episode = None
 
-    def set_itunes_season(self):
+    def set_itunes_season(self, tag):
         """Parses the episode season and sets value"""
         try:
-            self.itunes_season = self.soup.find('itunes:season').string
+            self.itunes_season = tag.string
         except AttributeError:
             self.itunes_season = None
 
-    def set_itunes_episode_type(self):
+    def set_itunes_episode_type(self, tag):
         """Parses the episode type and sets value"""
         try:
-            self.itunes_episode_type = self.soup.find('itunes:episodeType').string
+            self.itunes_episode_type = tag.string
         except AttributeError:
             self.itunes_episode_type = None
 
-    def set_itunes_block(self):
+    def set_itunes_block(self, tag):
         """Check and see if item is blocked from iTunes and sets value"""
         try:
-            block = self.soup.find('itunes:block').string.lower()
+            block = tag.string.lower()
         except AttributeError:
             block = ""
         if block == "yes":
@@ -250,55 +236,46 @@ class Item(object):
         else:
             self.itunes_block = False
 
-    def set_itunes_closed_captioned(self):
-        """Parses isClosedCaptioned from itunes tags and sets value"""
-        try:
-            self.itunes_closed_captioned = self.soup.find(
-                'itunes:isclosedcaptioned').string
-            self.itunes_closed_captioned = self.itunes_closed_captioned.lower()
-        except AttributeError:
-            self.itunes_closed_captioned = None
-
-    def set_itunes_duration(self):
+    def set_itunes_duration(self, tag):
         """Parses duration from itunes tags and sets value"""
         try:
-            self.itunes_duration = self.soup.find('itunes:duration').string
+            self.itunes_duration = tag.string
         except AttributeError:
             self.itunes_duration = None
 
-    def set_itunes_explicit(self):
+    def set_itunes_explicit(self, tag):
         """Parses explicit from itunes item tags and sets value"""
         try:
-            self.itunes_explicit = self.soup.find('itunes:explicit').string
+            self.itunes_explicit = tag.string
             self.itunes_explicit = self.itunes_explicit.lower()
         except AttributeError:
             self.itunes_explicit = None
 
-    def set_itune_image(self):
+    def set_itunes_image(self, tag):
         """Parses itunes item images and set url as value"""
         try:
-            self.itune_image = self.soup.find('itunes:image').get('href')
+            self.itunes_image = tag.get('href')
         except AttributeError:
-            self.itune_image = None
+            self.itunes_image = None
 
-    def set_itunes_order(self):
+    def set_itunes_order(self, tag):
         """Parses episode order and set url as value"""
         try:
-            self.itunes_order = self.soup.find('itunes:order').string
+            self.itunes_order = tag.string
             self.itunes_order = self.itunes_order.lower()
         except AttributeError:
             self.itunes_order = None
 
-    def set_itunes_subtitle(self):
+    def set_itunes_subtitle(self, tag):
         """Parses subtitle from itunes tags and sets value"""
         try:
-            self.itunes_subtitle = self.soup.find('itunes:subtitle').string
+            self.itunes_subtitle = tag.string
         except AttributeError:
             self.itunes_subtitle = None
 
-    def set_itunes_summary(self):
+    def set_itunes_summary(self, tag):
         """Parses summary from itunes tags and sets value"""
         try:
-            self.itunes_summary = self.soup.find('itunes:summary').string
+            self.itunes_summary = tag.string
         except AttributeError:
             self.itunes_summary = None

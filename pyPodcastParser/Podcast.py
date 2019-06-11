@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from datetime import datetime, date
 import email.utils
 from time import mktime
+import time
 
 from pyPodcastParser.Item import Item
 
+class InvalidPodcastFeed(ValueError):
+    pass
 
 class Podcast():
     """Parses an xml rss feed
@@ -30,56 +33,99 @@ class Podcast():
     Attributes:
         feed_content (str): The actual xml of the feed
         soup (bs4.BeautifulSoup): A soup of the xml with items and image removed
-        image_soup (bs4.BeautifulSoup): soup of image
-        full_soup (bs4.BeautifulSoup): A soup of the xml with items
-        categories (list): List for strings representing the feed categories
         copyright (str): The feed's copyright
-        creative_commons (str): The feed's creative commons license
         items (item): Item objects
         description (str): The feed's description
-        generator (str): The feed's generator
-        image_title (str): Feed image title
         image_url (str): Feed image url
-        image_link (str): Feed image link to homepage
-        image_width (str): Feed image width
-        image_height (str): Feed image height
         itunes_author_name (str): The podcast's author name for iTunes
         itunes_block (bool): Does the podcast block itunes
         itunes_categories (list): List of strings of itunes categories
         itunes_complete (str): Is this podcast done and complete
         itunes_explicit (str): Is this item explicit. Should only be "yes" and "clean."
-        itune_image (str): URL to itunes image
-        itunes_keywords (list): List of strings of itunes keywords
+        itunes_image (str): URL to itunes image
         itunes_new_feed_url (str): The new url of this podcast
         language (str): Language of feed
         last_build_date (str): Last build date of this feed
         link (str): URL to homepage
-        managing_editor (str): managing editor of feed
         published_date (str): Date feed was published
-        pubsubhubbub (str): The URL of the pubsubhubbub service for this feed
         owner_name (str): Name of feed owner
         owner_email (str): Email of feed owner
         subtitle (str): The feed subtitle
         title (str): The feed title
-        ttl (str): The time to live or number of minutes to cache feed
-        web_master (str): The feed's webmaster
-        is_valid_rss (bool): Is this a valid RSS Feed
-        is_valid_podcast (bool): Is this a valid Podcast
         date_time (datetime): When published
     """
 
     def __init__(self, feed_content):
-        #super(Podcast, self).__init__()
         self.feed_content = feed_content
+        self.items = []
+        self.itunes_categories = []
+
+        # Initialize attributes as they might not be populated
+        self.copyright = None
+        self.description = None
+        self.image_url = None
+        self.itunes_author_name = None
+        self.itunes_block = None
+        self.itunes_complete = None
+        self.itunes_explicit = None
+        self.itunes_image = None
+        self.itunes_new_feed_url = None
+        self.language = None
+        self.last_build_date = None
+        self.link = None
+        self.published_date = None
+        self.owner_name = None
+        self.owner_email = None
+        self.subtitle = None
+        self.title = None
+        self.date_time = None
+
         self.set_soup()
-        self.set_full_soup()
+        tag_methods = {
+            (None, 'copyright'): self.set_copyright,
+            (None, 'description'): self.set_description,
+            (None, 'image'): self.set_image,
+            (None, 'language'): self.set_language,
+            (None, 'lastBuildDate'): self.set_last_build_date,
+            (None, 'link'): self.set_link,
+            (None, 'pubDate'): self.set_published_date,
+            (None, 'title'): self.set_title,
+            (None, 'item'): self.add_item,
+            ('itunes', 'author'): self.set_itunes_author_name,
+            ('itunes', 'type'): self.set_itunes_type,
+            ('itunes', 'block'): self.set_itunes_block,
+            ('itunes', 'category'): self.add_itunes_category,
+            ('itunes', 'complete'): self.set_itunes_complete,
+            ('itunes', 'explicit'): self.set_itunes_explicit,
+            ('itunes', 'image'): self.set_itunes_image,
+            ('itunes', 'new-feed-url'): self.set_itunes_new_feed_url,
+            ('itunes', 'owner'): self.set_owner,
+            ('itunes', 'subtitle'): self.set_subtitle,
+            ('itunes', 'summary'): self.set_summary,
+        }
+        many_tag_methods = set([ (None, 'item'), ('itunes', 'category')])
 
-        self.set_extended_elements()
-        self.set_itunes()
-        self.set_optional_elements()
-        self.set_required_elements()
+        try:
+            channel = self.soup.rss.channel
+        except AttributeError:
+            raise InvalidPodcastFeed('Invalid Podcast Feed')
 
-        self.set_validity()
+        # Populate attributes based on feed content
+        for c in channel.children:
+            if not isinstance(c, Tag):
+                continue
+            try:
+                # Pop method to skip duplicated tag on invalid feeds
+                tag_tuple = (c.prefix, c.name)
+                if tag_tuple in many_tag_methods:
+                    tag_method = tag_methods[tag_tuple]
+                else:
+                    tag_method = tag_methods.pop(tag_tuple)
+            except (AttributeError, KeyError):
+                continue
+
+            tag_method(c)
+
         self.set_time_published()
         self.set_dates_published()
 
@@ -99,37 +145,12 @@ class Podcast():
         else:
             self.date_time = date.fromtimestamp(self.time_published)
 
-    def set_validity(self):
-        self.set_is_valid_rss()
-        self.set_is_valid_podcast()
-
-    def set_is_valid_rss(self):
-        """Check to if this is actually a valid RSS feed"""
-        if self.title and self.link and self.description:
-            self.is_valid_rss = True
-        else:
-            self.is_valid_rss = False
-
-    def set_is_valid_podcast(self):
-        for item in self.items:
-            if item.enclosure_type:
-                if item.enclosure_type.lower() == "audio/mpeg":
-                    self.is_valid_podcast = True
-                    return
-        self.is_valid_podcast =  False
-
     def to_dict(self):
         podcast_dict = {}
-        podcast_dict['categories'] = self.categories
         podcast_dict['copyright'] = self.copyright
-        podcast_dict['creative_commons'] = self.creative_commons
         podcast_dict['description'] = self.description
-        podcast_dict['generator'] = self.generator
-        podcast_dict['image_title'] = self.image_title
         podcast_dict['image_url'] = self.image_url
         podcast_dict['image_link'] = self.image_link
-        podcast_dict['image_width'] = self.image_width
-        podcast_dict['image_height'] = self.image_height
         podcast_dict['items'] = []
         for item in self.items:
             item_dict = item.to_dict()
@@ -140,173 +161,67 @@ class Podcast():
         podcast_dict['itunes_block'] = self.itunes_block
         podcast_dict['itunes_complete'] = self.image_width
         podcast_dict['itunes_explicit'] = self.itunes_explicit
-        podcast_dict['itune_image'] = self.itune_image
-        podcast_dict['itunes_keywords'] = self.image_width
+        podcast_dict['itunes_image'] = self.itunes_image
         podcast_dict['itunes_explicit'] = self.itunes_explicit
         podcast_dict['itunes_new_feed_url'] = self.itunes_new_feed_url
         podcast_dict['language'] = self.language
         podcast_dict['last_build_date'] = self.last_build_date
         podcast_dict['link'] = self.link
-        podcast_dict['managing_editor'] = self.managing_editor
         podcast_dict['published_date'] = self.published_date
-        podcast_dict['pubsubhubbub'] = self.pubsubhubbub
         podcast_dict['owner_name'] = self.owner_name
         podcast_dict['owner_email'] = self.owner_email
         podcast_dict['subtitle'] = self.subtitle
         podcast_dict['title'] = self.title
-        podcast_dict['ttl'] = self.ttl
         podcast_dict['type'] = self.type
-        podcast_dict['web_master'] = self.web_master
         return podcast_dict
-
-    def set_extended_elements(self):
-        """Parses and sets non required elements"""
-        self.set_creative_commons()
-        self.set_owner()
-        self.set_subtitle()
-        self.set_summary()
-
-    def set_itunes(self):
-        """Sets elements related to itunes"""
-        self.set_itunes_author_name()
-        self.set_itunes_type()
-        self.set_itunes_block()
-        self.set_itunes_complete()
-        self.set_itunes_explicit()
-        self.set_itune_image()
-        self.set_itunes_keywords()
-        self.set_itunes_new_feed_url()
-        self.set_itunes_categories()
-        self.set_items()
-
-    def set_optional_elements(self):
-        """Sets elements considered option by RSS spec"""
-        self.set_categories()
-        self.set_copyright()
-        self.set_generator()
-        self.set_image()
-        self.set_language()
-        self.set_last_build_date()
-        self.set_managing_editor()
-        self.set_published_date()
-        self.set_pubsubhubbub()
-        self.set_ttl()
-        self.set_web_master()
-
-    def set_required_elements(self):
-        """Sets elements required by RSS spec"""
-        self.set_title()
-        self.set_link()
-        self.set_description()
 
     def set_soup(self):
         """Sets soup and strips items"""
-        self.soup = BeautifulSoup(self.feed_content, "html.parser")
-        for item in self.soup.findAll('item'):
-            item.decompose()
-        for image in self.soup.findAll('image'):
-            image.decompose()
+        self.soup = BeautifulSoup(self.feed_content, features="lxml-xml")
 
-    def set_full_soup(self):
-        """Sets soup and keeps items"""
-        self.full_soup = BeautifulSoup(self.feed_content, "html.parser")
+    def add_item(self, tag):
+        item = Item(tag)
+        self.items.append(item)
 
-    def set_items(self):
-        self.items = []
-        full_soup_items = self.full_soup.findAll('item')
-        for full_soup_item in full_soup_items:
-            item = Item(full_soup_item)
-            if item:
-                self.items.append(item)
-
-    def set_categories(self):
-        """Parses and set feed categories"""
-        self.categories = []
-        temp_categories = self.soup.findAll('category')
-        for category in temp_categories:
-            category_text = category.string
-            self.categories.append(category_text)
-
-    def count_items(self):
-        """Counts Items in full_soup and soup. For debugging"""
-        soup_items = self.soup.findAll('item')
-        full_soup_items = self.full_soup.findAll('item')
-        return len(soup_items), len(full_soup_items)
-
-    def set_copyright(self):
+    def set_copyright(self, tag):
         """Parses copyright and set value"""
         try:
-            self.copyright = self.soup.find('copyright').string
+            self.copyright = tag.string
         except AttributeError:
             self.copyright = None
 
-    def set_creative_commons(self):
-        """Parses creative commons for item and sets value"""
-        try:
-            self.creative_commons = self.soup.find(
-                'creativecommons:license').string
-        except AttributeError:
-            self.creative_commons = None
-
-    def set_description(self):
+    def set_description(self, tag):
         """Parses description and sets value"""
         try:
-            self.description = self.soup.find('description').string
+            self.description = tag.string
         except AttributeError:
             self.description = None
 
-    def set_generator(self):
-        """Parses feed generator and sets value"""
-        try:
-            self.generator = self.soup.find('generator').string
-        except AttributeError:
-            self.generator = None
-
-    def set_image(self):
+    def set_image(self, tag):
         """Parses image element and set values"""
-        temp_soup = self.full_soup
-        for item in temp_soup.findAll('item'):
-            item.decompose()
-        image = temp_soup.find('image')
         try:
-            self.image_title = image.find('title').string
-        except AttributeError:
-            self.image_title = None
-        try:
-            self.image_url = image.find('url').string
+            self.image_url = tag.find('url', recursive=False).string
         except AttributeError:
             self.image_url = None
-        try:
-            self.image_link = image.find('link').string
-        except AttributeError:
-            self.image_link = None
-        try:
-            self.image_width = image.find('width').string
-        except AttributeError:
-            self.image_width = None
-        try:
-            self.image_height = image.find('height').string
-        except AttributeError:
-            self.image_height = None
 
-    def set_itunes_author_name(self):
+    def set_itunes_author_name(self, tag):
         """Parses author name from itunes tags and sets value"""
         try:
-            self.itunes_author_name = self.soup.find('itunes:author').string
+            self.itunes_author_name = tag.string
         except AttributeError:
             self.itunes_author_name = None
 
-    def set_itunes_type(self):
+    def set_itunes_type(self, tag):
         """Parses the type of show and sets value"""
         try:
-            self.itunes_type = self.soup.find('itunes:type').string
+            self.itunes_type = tag.string
         except AttributeError:
             self.itunes_type = None
 
-    def set_itunes_block(self):
+    def set_itunes_block(self, tag):
         """Check and see if podcast is blocked from iTunes and sets value"""
         try:
-            block = self.soup.find('itunes:block').string.lower()
+            block = tag.string.lower()
         except AttributeError:
             block = ""
         if block == "yes":
@@ -314,145 +229,95 @@ class Podcast():
         else:
             self.itunes_block = False
 
-    def set_itunes_categories(self):
-        """Parses and set itunes categories"""
-        self.itunes_categories = []
-        temp_categories = self.soup.findAll('itunes:category')
-        for category in temp_categories:
-            category_text = category.get('text')
-            self.itunes_categories.append(category_text)
+    def add_itunes_category(self, tag):
+        """Parses and add itunes category"""
+        category_text = tag.get('text')
+        self.itunes_categories.append(category_text)
 
-    def set_itunes_complete(self):
+    def set_itunes_complete(self, tag):
         """Parses complete from itunes tags and sets value"""
         try:
-            self.itunes_complete = self.soup.find('itunes:complete').string
-            self.itunes_complete = self.itunes_complete.lower()
+            self.itunes_complete = tag.string.lower()
         except AttributeError:
             self.itunes_complete = None
 
-    def set_itunes_explicit(self):
+    def set_itunes_explicit(self, tag):
         """Parses explicit from itunes tags and sets value"""
         try:
-            self.itunes_explicit = self.soup.find('itunes:explicit').string
-            self.itunes_explicit = self.itunes_explicit.lower()
+            self.itunes_explicit = tag.string.lower()
         except AttributeError:
             self.itunes_explicit = None
 
-    def set_itune_image(self):
+    def set_itunes_image(self, tag):
         """Parses itunes images and set url as value"""
         try:
-            self.itune_image = self.soup.find('itunes:image').get('href')
+            self.itunes_image = tag.get('href')
         except AttributeError:
-            self.itune_image = None
+            self.itunes_image = None
 
-    def set_itunes_keywords(self):
-        """Parses itunes keywords and set value"""
-        try:
-            keywords = self.soup.find('itunes:keywords').string
-        except AttributeError:
-            keywords = None
-        try:
-            self.itunes_keywords = [keyword.strip()
-                                    for keyword in keywords.split(',')]
-            self.itunes_keywords = list(set(self.itunes_keywords))
-        except AttributeError:
-            self.itunes_keywords = []
-
-    def set_itunes_new_feed_url(self):
+    def set_itunes_new_feed_url(self, tag):
         """Parses new feed url from itunes tags and sets value"""
         try:
-            self.itunes_new_feed_url = self.soup.find(
-                'itunes:new-feed-url').string
+            self.itunes_new_feed_url = tag.string
         except AttributeError:
             self.itunes_new_feed_url = None
 
-    def set_language(self):
+    def set_language(self, tag):
         """Parses feed language and set value"""
         try:
-            self.language = self.soup.find('language').string
+            self.language = tag.string
         except AttributeError:
             self.language = None
 
-    def set_last_build_date(self):
+    def set_last_build_date(self, tag):
         """Parses last build date and set value"""
         try:
-            self.last_build_date = self.soup.find('lastbuilddate').string
+            self.last_build_date = tag.string
         except AttributeError:
             self.last_build_date = None
 
-    def set_link(self):
+    def set_link(self, tag):
         """Parses link to homepage and set value"""
         try:
-            self.link = self.soup.find('link').string
+            self.link = tag.string
         except AttributeError:
             self.link = None
 
-    def set_managing_editor(self):
-        """Parses managing editor and set value"""
-        try:
-            self.managing_editor = self.soup.find('managingeditor').string
-        except AttributeError:
-            self.managing_editor = None
-
-    def set_published_date(self):
+    def set_published_date(self, tag):
         """Parses published date and set value"""
         try:
-            self.published_date = self.soup.find('pubdate').string
+            self.published_date = tag.string
         except AttributeError:
             self.published_date = None
 
-    def set_pubsubhubbub(self):
-        """Parses pubsubhubbub and email then sets value"""
-        self.pubsubhubbub = None
-        atom_links = self.soup.findAll('atom:link')
-        for atom_link in atom_links:
-            rel = atom_link.get('rel')
-            if rel == "hub":
-                self.pubsubhubbub = atom_link.get('href')
-
-    def set_owner(self):
+    def set_owner(self, tag):
         """Parses owner name and email then sets value"""
-        owner = self.soup.find('itunes:owner')
         try:
-            self.owner_name = owner.find('itunes:name').string
+            self.owner_name = tag.find('itunes:name', recursive=False).string
         except AttributeError:
             self.owner_name = None
         try:
-            self.owner_email = owner.find('itunes:email').string
+            self.owner_email = tag.find('itunes:email', recursive=False).string
         except AttributeError:
             self.owner_email = None
 
-    def set_subtitle(self):
+    def set_subtitle(self, tag):
         """Parses subtitle and sets value"""
         try:
-            self.subtitle = self.soup.find('itunes:subtitle').string
+            self.subtitle = tag.string
         except AttributeError:
             self.subtitle = None
 
-    def set_summary(self):
+    def set_summary(self, tag):
         """Parses summary and set value"""
         try:
-            self.summary = self.soup.find('itunes:summary').string
+            self.summary = tag.string
         except AttributeError:
             self.summary = None
 
-    def set_title(self):
+    def set_title(self, tag):
         """Parses title and set value"""
         try:
-            self.title = self.soup.title.string
+            self.title = tag.string
         except AttributeError:
             self.title = None
-
-    def set_ttl(self):
-        """Parses summary and set value"""
-        try:
-            self.ttl = self.soup.find('ttl').string
-        except AttributeError:
-            self.ttl = None
-
-    def set_web_master(self):
-        """Parses the feed's webmaster and sets value"""
-        try:
-            self.web_master = self.soup.find('webmaster').string
-        except AttributeError:
-            self.web_master = None
