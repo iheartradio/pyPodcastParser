@@ -65,7 +65,7 @@ class Podcast():
         self.description = None
         self.image_url = None
         self.itunes_author_name = None
-        self.itunes_block = None
+        self.itunes_block = False
         self.itunes_complete = None
         self.itunes_explicit = None
         self.itunes_image = None

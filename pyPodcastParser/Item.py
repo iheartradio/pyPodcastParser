@@ -46,7 +46,7 @@ class Item(object):
         self.enclosure_length = None
         self.guid = None
         self.itunes_author_name = None
-        self.itunes_block = None
+        self.itunes_block = False
         self.itunes_duration = None
         self.itunes_explicit = None
         self.itunes_image = None
