@@ -178,8 +178,12 @@ class Podcast():
         return podcast_dict
 
     def set_soup(self):
-        """Sets soup and strips items"""
-        self.soup = BeautifulSoup(self.feed_content, features="lxml-xml")
+        """Sets soup"""
+        if self.feed_content.startswith(b'<?xml'):
+            self.soup = BeautifulSoup(self.feed_content, features="lxml-xml")
+        else:
+            c = self.feed_content
+            self.soup = BeautifulSoup(c[c.index(b'<?xml'):], features="lxml-xml")
 
     def add_item(self, tag):
         item = Item(tag)
