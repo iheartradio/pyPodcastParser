@@ -183,7 +183,11 @@ class Podcast():
             self.soup = BeautifulSoup(self.feed_content, features="lxml-xml")
         else:
             c = self.feed_content
-            self.soup = BeautifulSoup(c[c.index(b'<?xml'):], features="lxml-xml")
+            try:
+                recovered_content = c[c.index(b'<?xml'):]
+                self.soup = BeautifulSoup(recovered_content, features="lxml-xml")
+            except:
+                self.soup = BeautifulSoup(self.feed_content, features="lxml-xml")
 
     def add_item(self, tag):
         item = Item(tag)
