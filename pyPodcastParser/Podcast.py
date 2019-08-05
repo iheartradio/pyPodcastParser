@@ -128,6 +128,10 @@ class Podcast():
 
             tag_method(c)
 
+        if not self.items:
+            for item in self.soup.find_all('item'):
+                self.add_item(item)
+
         self.set_time_published()
         self.set_dates_published()
 
