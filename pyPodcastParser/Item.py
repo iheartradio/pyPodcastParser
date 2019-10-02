@@ -105,18 +105,21 @@ class Item(object):
         if self.published_date is None:
             self.time_published = None
             return
-        time_tuple = email.utils.parsedate_tz(self.published_date)
         try:
+            time_tuple = email.utils.parsedate_tz(self.published_date)
             self.time_published = email.utils.mktime_tz(time_tuple)
-        except TypeError:
+        except (TypeError, ValueError, IndexError):
             self.time_published = None
 
     def set_dates_published(self):
         if self.time_published is None:
             self.date_time = None
             return
-        time_tuple = email.utils.parsedate(self.published_date)
-        self.date_time = date.fromtimestamp(self.time_published)
+        try:
+            time_tuple = email.utils.parsedate(self.published_date)
+            self.date_time = date.fromtimestamp(self.time_published)
+        except ValueError:
+            self.date_time = None
 
     def to_dict(self):
         item = {}
