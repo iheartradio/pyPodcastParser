@@ -109,11 +109,12 @@ class Podcast():
 
         try:
             channel = self.soup.rss.channel
+            channel_items = channel.children
         except AttributeError:
             raise InvalidPodcastFeed('Invalid Podcast Feed')
 
         # Populate attributes based on feed content
-        for c in channel.children:
+        for c in channel_items:
             if not isinstance(c, Tag):
                 continue
             try:
