@@ -5,7 +5,7 @@ import email.utils
 from time import mktime
 import time
 
-from pyPodcastParser.Item import Item
+from pypodcastparser.Item import Item
 
 class InvalidPodcastFeed(ValueError):
     pass
@@ -156,11 +156,11 @@ class Podcast():
                 self.date_time = None
 
     def to_dict(self):
+        """Create dict representation of Podcast object."""
         podcast_dict = {}
         podcast_dict['copyright'] = self.copyright
         podcast_dict['description'] = self.description
         podcast_dict['image_url'] = self.image_url
-        podcast_dict['image_link'] = self.image_link
         podcast_dict['items'] = []
         for item in self.items:
             item_dict = item.to_dict()
@@ -169,7 +169,6 @@ class Podcast():
         podcast_dict['itunes_block'] = self.itunes_block
         podcast_dict['itunes_categories'] = self.itunes_categories
         podcast_dict['itunes_block'] = self.itunes_block
-        podcast_dict['itunes_complete'] = self.image_width
         podcast_dict['itunes_explicit'] = self.itunes_explicit
         podcast_dict['itunes_image'] = self.itunes_image
         podcast_dict['itunes_explicit'] = self.itunes_explicit
@@ -182,7 +181,7 @@ class Podcast():
         podcast_dict['owner_email'] = self.owner_email
         podcast_dict['subtitle'] = self.subtitle
         podcast_dict['title'] = self.title
-        podcast_dict['type'] = self.type
+        podcast_dict['itunes_type'] = self.itunes_type
         return podcast_dict
 
     def set_soup(self):
@@ -250,7 +249,15 @@ class Podcast():
     def add_itunes_category(self, tag):
         """Parses and add itunes category"""
         category_text = tag.get('text')
-        self.itunes_categories.append(category_text)
+
+        # prevent duplicate categories
+        if category_text not in self.itunes_categories:
+            self.itunes_categories.append(category_text)
+
+        # get subcategories
+        for content in tag.contents:
+            if isinstance(content, Tag) and content.prefix == 'itunes' and content.name == 'category':
+                self.add_itunes_category(content)
 
     def set_itunes_complete(self, tag):
         """Parses complete from itunes tags and sets value"""

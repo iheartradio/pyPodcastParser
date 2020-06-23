@@ -1,10 +1,35 @@
+# Use Python
 language: python
-python: "3.4"
-# command to install dependencies
-install:
-- "pip install -r requirements.txt"
-# command to run tests
+
+# Run the test runner using the same version of Python we use.
+python: 3.6
+
+services:
+  - docker
+
+# Install the test runner.
+install: pip install tox
+
+# Run each environment separately so we get errors back from all of them.
+env:
+  - TOX_ENV=py36
+  - TOX_ENV=pep8
 script:
-  - tox
-after_success:
-  coveralls
+  - tox -e $TOX_ENV
+
+# Control the branches that get built.
+branches:
+  only:
+    - master
+    - /^v[0-9]+\.[0-9]+\.[0-9]+/
+
+deploy:
+  provider: script
+  script: bash ./scripts/deploy.sh $TRAVIS_TAG
+  on:
+    tags: true
+    condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+
+# Notify us about build status.
+notifications:
+  slack:
+    secure: "Abt19+xgBqxtEXxJiDxyLRczsD8Dazdt2ONfQlWHxzpQg7ZxO8QcGXFp+pQIn+sC5pm5aB+ckN00w63tTFr6rLK8FnV8qUz6aQKIvo238B2i0kRGT9LzEGDxI2Obg+o2WNi6j5GFDzYPujufa483ELJGGUAs7WN+p82VHqd2OOGGc8VjDFCQKLCQCspGPaE/V0vEO4wXPJ/Y6pQ70c8jIhO16lecQhlZV2ROKEcf/6STS4eaWsuvoEmP/+zkyrbFD2eKwKqM+2NpE2IBOJDyVH6mNcrYbm9iYRPL1JsN1C6vACieNj5hWVtQwhCOsFQ7thtVufJVusrL7VXaKhUXPF49GDFDw6Ha1hTfUhHSq61hjWbwh6kuQqVOenyDJqMfeHcZT0NNJAuK9e0xXxkdXqOgojkx0XT9vOyU7srMvxYgnX1gGSPYOvIHuToggk16+DI7dhDP9K/vYa18Msl8KNF8kbDft1JZ4phdvDd5LvcZXxpu40QayD2SNrI8VSothpJYMq9soLjQGjKXaPnD4vkS27uc97mxDyfuD9pe33qc15JX5D75/BZDNxR8QpZUcOiuctoL+bTD56NAHPUQQon6GNnOE2rEi49nqKL63XcTUSOlAYvohdh2RhleBPC+yzLmNwu6YYRnKqpwa0gs6qORyQFTxedsFHlYzgZCmuo="
