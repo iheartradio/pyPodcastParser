@@ -1,8 +1,10 @@
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
     <channel>
 
-        <category domain="http://www.example.com/1">Example 1</category>
-        <category>Example category 2</category>
+        <itunes:category text="News">
+			<itunes:category text="Business News"/>
+		</itunes:category>
+		<itunes:category text="Health"/>
         <copyright>basic copyright</copyright>
         <description>basic description</description>
         <generator>an infinite monkeys</generator>
@@ -15,7 +17,7 @@
         </image>
         <language>basic  language</language>
         <lastBuildDate>Mon, 24 Mar 2008 23:30:07 GMT</lastBuildDate>
-        <link>https://github.com/jrigden/pyPodcastParser</link>]
+        <link>https://github.com/iheartradio/pyPodcastParser</link>]
         <atom:link href="https://bubpubsubhub.appspot.com" />
         <atom:link rel="buh" href="https://bubpubsubhub.appspot.com" />
         <atom:link href="https://pubsubhubbub.appspot.com" />
@@ -34,11 +36,9 @@
         <webMaster>webrobot</webMaster>
 
         <itunes:author>basic itunes author</itunes:author>
-        <itunes:category text="Health"/>
-        <itunes:category text="News"/>
         <itunes:complete>yes</itunes:complete>
         <itunes:explicit>clean</itunes:explicit>
-        <itunes:image href="https://github.com/jrigden/pyPodcastParser.jpg"/>
+        <itunes:image href="https://github.com/iheartradio/pyPodcastParser.jpg"/>
         <itunes:keywords>Python, Testing</itunes:keywords>
         <itunes:new-feed-url>http://newlocation.com/example.rss</itunes:new-feed-url>
         <itunes:owner>
@@ -61,7 +61,7 @@
             <pubDate>Fri, 21 Mar 2008 09:51:00 EDT</pubDate>
             <title>basic item title</title>
 
-            <enclosure length="123456" url="https://github.com/jrigden/pyPodcastParser.mp3" type="audio/mpeg"/>
+            <enclosure length="123456" url="https://github.com/iheartradio/pyPodcastParser.mp3" type="audio/mpeg"/>
 
             <itunes:author>basic item itunes author</itunes:author>
             <itunes:isClosedCaptioned>yes</itunes:isClosedCaptioned>
@@ -88,7 +88,7 @@
             <pubDate>Fri, 21 Mar 2008 09:50:00 EDT</pubDate>
             <title>another basic item title</title>
 
-            <enclosure length="123456" url="https://github.com/jrigden/pyPodcastParser.mp3" type="audio/mpeg"/>
+            <enclosure length="123456" url="https://github.com/iheartradio/pyPodcastParser.mp3" type="audio/mpeg"/>
 
             <itunes:author>another basic item itunes author</itunes:author>
             <itunes:duration>1:11:05</itunes:duration>

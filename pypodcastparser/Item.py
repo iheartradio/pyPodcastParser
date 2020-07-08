@@ -1,7 +1,7 @@
-from datetime import datetime, date
-import email.utils
-from time import mktime
 from bs4 import Tag
+from datetime import date
+import email.utils
+
 
 class Item(object):
     """Parses an xml rss feed
@@ -13,7 +13,8 @@ class Item(object):
         soup (bs4.BeautifulSoup): BeautifulSoup object representing a rss item
 
     Note:
-        All attributes with empty or nonexistent element will have a value of None
+        All attributes with empty or nonexistent element
+        will have a value of None
 
     Attributes:
         author (str): The author of the item
@@ -28,7 +29,8 @@ class Item(object):
         itunes_season (int): Podcast season
         itunes_block (bool): It this Item blocked from itunes
         itunes_duration (str): Duration of enclosure
-        itunes_explicit (str): Is this item explicit. Should only be yes or clean.
+        itunes_explicit (str): Is this item explicit.
+        Should only be yes or clean.
         itunes_image (str): URL of item cover art
         itunes_order (str): Override published_date order
         itunes_subtitle (str): The item subtitle
@@ -36,7 +38,6 @@ class Item(object):
         content_encoded(str): The encoded content of the item
         published_date (str): Date item was published
         title (str): The title of item.
-        date_time (datetime): When published
     """
 
     def __init__(self, soup):
@@ -116,7 +117,6 @@ class Item(object):
             self.date_time = None
             return
         try:
-            time_tuple = email.utils.parsedate(self.published_date)
             self.date_time = date.fromtimestamp(self.time_published)
         except ValueError:
             self.date_time = None
@@ -175,16 +175,16 @@ class Item(object):
         """Parses enclosure_url, enclosure_type then set values."""
         try:
             self.enclosure_url = tag['url']
-        except:
+        except Exception:
             self.enclosure_url = None
         try:
             self.enclosure_type = tag['type']
-        except:
+        except Exception:
             self.enclosure_type = None
         try:
             self.enclosure_length = tag['length']
             self.enclosure_length = int(self.enclosure_length)
-        except:
+        except Exception:
             self.enclosure_length = None
 
     def set_guid(self, tag):

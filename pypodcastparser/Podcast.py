@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup, Tag
-from datetime import datetime, date
+from datetime import date
 import email.utils
-from time import mktime
-import time
 
 from pypodcastparser.Item import Item
+
 
 class InvalidPodcastFeed(ValueError):
     pass
 
-class Podcast():
+
+class Podcast:
     """Parses an xml rss feed
 
     RSS Specs http://cyber.law.harvard.edu/rss/rss.html
@@ -20,19 +20,23 @@ class Podcast():
     iTunes Podcast Specs http://www.apple.com/itunes/podcasts/specs.html
 
 
-    The cloud element aka RSS Cloud is not supported as it has been superseded by the superior PubSubHubbub protocal
+    The cloud element aka RSS Cloud is not supported as it has been
+    superseded by the superior PubSubHubbub protocal
 
     Args:
         feed_content (str): An rss string
 
     Note:
-        All attributes with empty or nonexistent element will have a value of None
+        All attributes with empty or nonexistent element
+        will have a value of None
 
-        Attributes are generally strings or lists of strings, because we want to record the literal value of elements.
+        Attributes are generally strings or lists of strings,
+        because we want to record the literal value of elements.
 
     Attributes:
-        feed_content (str): The actual xml of the feed
-        soup (bs4.BeautifulSoup): A soup of the xml with items and image removed
+        feed_content (bytes): The actual xml of the feed
+        soup (bs4.BeautifulSoup): A soup of the xml with items
+        and image removed
         copyright (str): The feed's copyright
         items (item): Item objects
         description (str): The feed's description
@@ -41,8 +45,10 @@ class Podcast():
         itunes_block (bool): Does the podcast block itunes
         itunes_categories (list): List of strings of itunes categories
         itunes_complete (str): Is this podcast done and complete
-        itunes_explicit (str): Is this item explicit. Should only be "yes" and "clean."
+        itunes_explicit (str): Is this item explicit.
+        Should only be "yes" and "clean."
         itunes_image (str): URL to itunes image
+        itunes_keywords (list): List of strings of itunes keywords
         itunes_new_feed_url (str): The new url of this podcast
         language (str): Language of feed
         last_build_date (str): Last build date of this feed
@@ -52,13 +58,13 @@ class Podcast():
         owner_email (str): Email of feed owner
         subtitle (str): The feed subtitle
         title (str): The feed title
-        date_time (datetime): When published
     """
 
     def __init__(self, feed_content):
         self.feed_content = feed_content
         self.items = []
         self.itunes_categories = []
+        self.itunes_keywords = []
 
         # Initialize attributes as they might not be populated
         self.copyright = None
@@ -100,12 +106,15 @@ class Podcast():
             ('itunes', 'complete'): self.set_itunes_complete,
             ('itunes', 'explicit'): self.set_itunes_explicit,
             ('itunes', 'image'): self.set_itunes_image,
+            ('itunes', 'keywords'): self.set_itunes_keywords,
             ('itunes', 'new-feed-url'): self.set_itunes_new_feed_url,
             ('itunes', 'owner'): self.set_owner,
             ('itunes', 'subtitle'): self.set_subtitle,
             ('itunes', 'summary'): self.set_summary,
         }
-        many_tag_methods = set([ (None, 'item'), ('itunes', 'category')])
+        many_tag_methods = set(
+            [(None, 'item'), ('itunes', 'category'), ('itunes', 'keywords')]
+        )
 
         try:
             channel = self.soup.rss.channel
@@ -171,6 +180,7 @@ class Podcast():
         podcast_dict['itunes_block'] = self.itunes_block
         podcast_dict['itunes_explicit'] = self.itunes_explicit
         podcast_dict['itunes_image'] = self.itunes_image
+        podcast_dict['itunes_keywords'] = self.itunes_keywords
         podcast_dict['itunes_explicit'] = self.itunes_explicit
         podcast_dict['itunes_new_feed_url'] = self.itunes_new_feed_url
         podcast_dict['language'] = self.language
@@ -192,9 +202,13 @@ class Podcast():
             c = self.feed_content
             try:
                 recovered_content = c[c.index(b'<?xml'):]
-                self.soup = BeautifulSoup(recovered_content, features="lxml-xml")
-            except:
-                self.soup = BeautifulSoup(self.feed_content, features="lxml-xml")
+                self.soup = BeautifulSoup(
+                    recovered_content, features="lxml-xml"
+                )
+            except Exception:
+                self.soup = BeautifulSoup(
+                    self.feed_content, features="lxml-xml"
+                )
 
     def add_item(self, tag):
         item = Item(tag)
@@ -247,7 +261,7 @@ class Podcast():
             self.itunes_block = False
 
     def add_itunes_category(self, tag):
-        """Parses and add itunes category"""
+        """Parses and adds itunes category"""
         category_text = tag.get('text')
 
         # prevent duplicate categories
@@ -256,7 +270,11 @@ class Podcast():
 
         # get subcategories
         for content in tag.contents:
-            if isinstance(content, Tag) and content.prefix == 'itunes' and content.name == 'category':
+            if (
+                isinstance(content, Tag)
+                and content.prefix == 'itunes'
+                and content.name == 'category'
+            ):
                 self.add_itunes_category(content)
 
     def set_itunes_complete(self, tag):
@@ -279,6 +297,20 @@ class Podcast():
             self.itunes_image = tag.get('href')
         except AttributeError:
             self.itunes_image = None
+
+    def set_itunes_keywords(self, tag):
+        """Parses and adds itunes keywords"""
+        try:
+            keywords_list = tag.string.split(',')
+
+            # remove leading and trailing whitespace,
+            # remove consecutive whitespace
+            normalized_keywords_list = [
+                ' '.join(kw.split()) for kw in keywords_list
+            ]
+            self.itunes_keywords = normalized_keywords_list
+        except AttributeError:
+            self.itunes_keywords = []
 
     def set_itunes_new_feed_url(self, tag):
         """Parses new feed url from itunes tags and sets value"""
