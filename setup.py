@@ -9,17 +9,17 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='pyPodcastParser',
+    name='pypodcastparser',
 
     version='2.0.0',
 
-    description='pyPodcastParser is a podcast parser.',
+    description='pypodcastparser is a podcast parser.',
     long_description=long_description,
 
-    url='https://github.com/jrigden/pyPodcastParser',
+    url='https://github.com/iheartradio/pypodcastparser',
 
-    author='Jason Rigden',
-    author_email='jasonrigden@gmail.com',
+    author='Christian Paul, Jason Rigden',
+    author_email='christianpaul@iheartmedia.com, jasonrigden@gmail.com',
 
     license='MIT',
 

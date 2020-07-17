@@ -3,16 +3,16 @@ import datetime
 import os
 import unittest
 
-from pyPodcastParser import Podcast
+from pypodcastparser import Podcast
 
-# py.test test_pyPodcastParser.py
+# py.test test_pypodcastparser.py
 
 #######
-# coverage run --source pyPodcastParser -m py.test
+# coverage run --source pypodcastparser -m py.test
 #######
-# py.test --cov=pyPodcastParser tests/
+# py.test --cov=pypodcastparser tests/
 #######
-# py.test -v   --capture=sys tests/test_pyPodcastParser.py
+# py.test -v   --capture=sys tests/test_pypodcastparser.py
 
 
 class Test_Test(unittest.TestCase):
@@ -150,7 +150,7 @@ class Test_Basic_Feed_Items(unittest.TestCase):
         self.assertEqual(self.podcast.items[1].itunes_summary, "Another Summary")
 
     def test_item_enclosure_url(self):
-        self.assertEqual(self.podcast.items[0].enclosure_url, 'https://github.com/jrigden/pyPodcastParser.mp3')
+        self.assertEqual(self.podcast.items[0].enclosure_url, 'https://github.com/jrigden/pypodcastparser.mp3')
 
     def test_item_enclosure_type(self):
         self.assertEqual(self.podcast.items[0].enclosure_type, 'audio/mpeg')
@@ -233,7 +233,7 @@ class Test_Basic_Feed(unittest.TestCase):
 
     def test_itune_image(self):
         self.assertEqual(self.podcast.itune_image,
-                         "https://github.com/jrigden/pyPodcastParser.jpg")
+                         "https://github.com/jrigden/pypodcastparser.jpg")
 
     def test_itunes_categories_length(self):
         number_of_categories = len(self.podcast.itunes_categories)
@@ -255,7 +255,7 @@ class Test_Basic_Feed(unittest.TestCase):
 
     def test_link(self):
         self.assertEqual(self.podcast.link,
-                         "https://github.com/jrigden/pyPodcastParser")
+                         "https://github.com/jrigden/pypodcastparser")
 
     def test_managing_editor(self):
         self.assertEqual(self.podcast.managing_editor, "nobody")
