@@ -1,7 +1,7 @@
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
   <channel>
     <title>basic title</title>
-    <link>https://github.com/jrigden/pyPodcastParser</link>
+    <link>https://github.com/iheartradio/pyPodcastParser</link>
     <description>basic description</description>
     <itunes:author>basic itunes author</itunes:author>
     <copyright>basic copyright</copyright>
@@ -21,7 +21,7 @@
     <itunes:category text="News"/>
     <itunes:category text="Health"/>
     <itunes:explicit>yes</itunes:explicit>
-    <itunes:image href="https://github.com/jrigden/pyPodcastParser.jpg"/>
+    <itunes:image href="https://github.com/iheartradio/pyPodcastParser.jpg"/>
 
     <itunes:subtitle>basic itunes subtitle</itunes:subtitle>
     <itunes:summary>basic itunes summary</itunes:summary>
@@ -56,7 +56,7 @@
 
       <category>News</category>
       <pubDate>Fri, 21 Mar 2008 09:51:00 EDT</pubDate>
-      <enclosure length="123456" url="https://github.com/jrigden/pyPodcastParser.mp3" type="audio/mpeg"/>
+      <enclosure length="123456" url="https://github.com/iheartradio/pyPodcastParser.mp3" type="audio/mpeg"/>
     </item>
 
     <item>
@@ -79,7 +79,7 @@
       <category>News</category>
       <itunes:image href="http://poo.poo/jpg.gif"/>
       <pubDate>Fri, 21 Mar 2008 09:50:00 EDT</pubDate>
-      <enclosure length="123456" url="https://github.com/jrigden/pyPodcastParser.mp3" type="audio/mpeg"/>
+      <enclosure length="123456" url="https://github.com/iheartradio/pyPodcastParser.mp3" type="audio/mpeg"/>
   </item>
 
   </channel>

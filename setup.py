@@ -9,9 +9,9 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='pypodcastparser',
+    name='pypodcastparser-ihr',
 
-    version='2.0.0',
+    version='1.0.0',
 
     description='pypodcastparser is a podcast parser.',
     long_description=long_description,
@@ -32,18 +32,12 @@ setup(
 
         'License :: OSI Approved :: MIT License',
 
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.7',
     ],
 
     install_requires=[
         "beautifulsoup4",
+        "lxml",
     ],
 
     keywords=['podcast', 'parser', 'rss', 'feed'],

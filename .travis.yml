@@ -2,7 +2,7 @@
 language: python
 
 # Run the test runner using the same version of Python we use.
-python: 3.6
+python: 3.7
 
 services:
   - docker
@@ -12,7 +12,7 @@ install: pip install tox
 
 # Run each environment separately so we get errors back from all of them.
 env:
-  - TOX_ENV=py36
+  - TOX_ENV=py37
   - TOX_ENV=pep8
 script:
   - tox -e $TOX_ENV
