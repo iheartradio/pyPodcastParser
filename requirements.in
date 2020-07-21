@@ -1,6 +1,6 @@
 beautifulsoup4
 docopt
+lxml
 pluggy
 requests
 wheel
-lxml
