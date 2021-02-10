@@ -2,7 +2,6 @@
 from bs4 import BeautifulSoup, Tag
 from datetime import date
 import email.utils
-
 from pypodcastparser.Item import Item
 
 
@@ -308,7 +307,14 @@ class Podcast:
             normalized_keywords_list = [
                 ' '.join(kw.split()) for kw in keywords_list
             ]
-            self.itunes_keywords = normalized_keywords_list
+
+            # remove duplicate keywords
+            # remove empty entries
+            unique_keywords_list = list(set(normalized_keywords_list))
+            if '' in unique_keywords_list:
+                unique_keywords_list.remove('')
+
+            self.itunes_keywords = unique_keywords_list
         except AttributeError:
             self.itunes_keywords = []
 
