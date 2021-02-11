@@ -228,6 +228,30 @@ class TestBasicFeed(unittest.TestCase):
         self.assertTrue(isinstance(self.podcast.date_time, datetime.date))
 
 
+class TestKeywordVariability(unittest.TestCase):
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        test_feeds_dir = os.path.join(test_dir, 'test_feeds')
+        basic_podcast_path = os.path.join(test_feeds_dir, 'keyword_variability.rss')
+        keyword_variability_file = open(basic_podcast_path, "rb")
+        self.podcast = Podcast.Podcast(keyword_variability_file.read())
+
+    def test_keywords(self):
+        self.assertEqual(sorted(self.podcast.itunes_keywords), ['Python', 'Testing'])
+
+
+class TestKeywordAbsence(unittest.TestCase):
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        test_feeds_dir = os.path.join(test_dir, 'test_feeds')
+        basic_podcast_path = os.path.join(test_feeds_dir, 'no_keywords.rss')
+        no_keywords = open(basic_podcast_path, "rb")
+        self.podcast = Podcast.Podcast(no_keywords.read())
+
+    def test_keywords(self):
+        self.assertEqual(self.podcast.itunes_keywords, [])
+
+
 class TestUnicodeFeed(unittest.TestCase):
 
     def setUp(self):
@@ -267,7 +291,7 @@ class TestUnicodeFeed(unittest.TestCase):
 
     def test_itunes_keyword_length(self):
         number_of_keywords = len(self.podcast.itunes_keywords)
-        self.assertEqual(number_of_keywords, 2)
+        self.assertEqual(number_of_keywords, 1)
 
     def test_itunes_new_feed_url(self):
         self.assertEqual(self.podcast.itunes_new_feed_url, self.unicodeish_text)
