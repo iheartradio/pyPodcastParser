@@ -34,6 +34,12 @@ stages:
   - name: deploy
     if: branch = master AND NOT type in (pull_request)
 
+# Control the branches that get built.
+branches:
+  only:
+    - master
+    - /^v[0-9]+\.[0-9]+\.[0-9]+/
+
 # Notify us about build status.
 notifications:
   slack:
