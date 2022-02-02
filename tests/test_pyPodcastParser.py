@@ -230,7 +230,7 @@ class TestBasicFeed(unittest.TestCase):
     def test_interactive(self):
         self.assertFalse(self.podcast.interactive)
 
-class TestBasicInteractiveFeed(unittest.TestCase):
+class TestIHRInteractiveFeed(unittest.TestCase):
 
     def setUp(self):
         test_dir = os.path.dirname(__file__)
