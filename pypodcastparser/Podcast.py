@@ -57,6 +57,7 @@ class Podcast:
         owner_email (str): Email of feed owner
         subtitle (str): The feed subtitle
         title (str): The feed title
+        interactive (boolean): Is an iheart podcast interactive
     """
 
     def __init__(self, feed_content):
@@ -86,6 +87,7 @@ class Podcast:
         self.title = None
         self.date_time = None
         self.itunes_type = None
+        self.interactive = False
 
         self.set_soup()
         tag_methods = {
@@ -110,6 +112,7 @@ class Podcast:
             ('itunes', 'owner'): self.set_owner,
             ('itunes', 'subtitle'): self.set_subtitle,
             ('itunes', 'summary'): self.set_summary,
+            ('ihr', 'interactive'): self.set_interactive,
         }
         many_tag_methods = set(
             [(None, 'item'), ('itunes', 'category'), ('itunes', 'keywords')]
@@ -384,3 +387,10 @@ class Podcast:
             self.title = tag.string
         except AttributeError:
             self.title = None
+    
+    def set_interactive(self, tag):
+        """Parses ihr-interactive tag and sets true if 'yes' False if otherwise"""
+        try:
+            self.interactive = (tag.string.lower() == "yes")
+        except AttributeError:
+            self.interactive = False

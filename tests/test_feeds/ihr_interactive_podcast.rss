@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss version="2.0"
+  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:adori="https://adorilabs.com/rss"
+  xmlns:ihr="http://iheart.com/rss/ihr">
+  <channel>
+    <itunes:category text="News">
+			<itunes:category text="Business News"/>
+		</itunes:category>
+		<itunes:category text="Health"/>
+        <copyright>basic copyright</copyright>
+        <description>basic description</description>
+        <generator>an infinite monkeys</generator>
+        <image>
+            <title>Test Image</title>
+            <url>https://test/giffy.jpg</url>
+            <link>https://test</link>
+            <width>1000</width>
+            <height>5000</height>
+        </image>
+        <language>basic  language</language>
+        <lastBuildDate>Mon, 24 Mar 2008 23:30:07 GMT</lastBuildDate>
+        <link>https://github.com/iheartradio/pyPodcastParser</link>]
+        <atom:link href="https://bubpubsubhub.appspot.com" />
+        <atom:link rel="buh" href="https://bubpubsubhub.appspot.com" />
+        <atom:link href="https://pubsubhubbub.appspot.com" />
+
+        <atom:link rel="hub" href="https://pubsubhubbub.appspot.com" />
+
+        <atom:link />
+
+        <atom:link href="https://bubpubsubhub.pspot.com" />
+        <atom:link rel="buh" href="https://bubpubsuhub.appspot.com" />
+        <atom:link href="https://pubsubhbub.appspot.com" />
+        <managingEditor>nobody</managingEditor>
+        <pubDate>Mon, 24 Mar 2008 23:30:07 GMT</pubDate>
+        <title>basic title</title>
+        <ttl>60</ttl>
+        <webMaster>webrobot</webMaster>
+
+        <itunes:author>basic itunes author</itunes:author>
+        <itunes:complete>yes</itunes:complete>
+        <itunes:explicit>clean</itunes:explicit>
+        <itunes:image href="https://github.com/iheartradio/pyPodcastParser.jpg"/>
+        <itunes:keywords>Python, Testing</itunes:keywords>
+        <itunes:new-feed-url>http://newlocation.com/example.rss</itunes:new-feed-url>
+        <itunes:owner>
+            <itunes:email>basic itunes owner email</itunes:email>
+            <itunes:name>basic itunes owner name</itunes:name>
+        </itunes:owner>
+        <itunes:subtitle>basic itunes subtitle</itunes:subtitle>
+        <itunes:summary>basic itunes summary</itunes:summary>
+
+        <item>
+
+            <author>lawyer@boyer.net</author>
+            <category>Grateful Dead</category>
+            <category>Stones</category>
+            <comments>http://comments.com/entry/0</comments>
+            <creativeCommons:license>http://www.creativecommons.org/licenses/by-nc/1.0</creativeCommons:license>
+            <description>basic item description</description>
+            <guid isPermaLink="true">basic item guid</guid>
+            <link>http://google.com/0</link>
+            <pubDate>Fri, 21 Mar 2008 09:51:00 EDT</pubDate>
+            <title>basic item title</title>
+
+            <enclosure length="123456" url="https://github.com/iheartradio/pyPodcastParser.mp3" type="audio/mpeg"/>
+
+            <itunes:author>basic item itunes author</itunes:author>
+            <itunes:isClosedCaptioned>yes</itunes:isClosedCaptioned>
+            <itunes:duration>1:05</itunes:duration>
+            <itunes:explicit>no</itunes:explicit>
+            <itunes:image href="http://poo.poo/gif.jpg"/>
+            <itunes:keywords/>
+            <itunes:order>2</itunes:order>
+            <itunes:subtitle>The Subtitle</itunes:subtitle>
+            <itunes:summary>The Summary</itunes:summary>
+
+
+        </item>
+
+        <item>
+
+            <author>lawyer@boyer.net (Lawyer Boyer)</author>
+            <category>Dead and Grateful</category>
+            <category>News</category>
+            <comments>http://comments.com/entry/1</comments>
+            <description>another basic item description</description>
+            <guid isPermaLink="true">another basic item guid</guid>
+            <link>http://google.com/1</link>
+            <pubDate>Fri, 21 Mar 2008 09:50:00 EDT</pubDate>
+            <title>another basic item title</title>
+
+            <enclosure length="123456" url="https://github.com/iheartradio/pyPodcastParser.mp3" type="audio/mpeg"/>
+
+            <itunes:author>another basic item itunes author</itunes:author>
+            <itunes:duration>1:11:05</itunes:duration>
+            <itunes:explicit>clean</itunes:explicit>
+            <itunes:image href="http://poo.poo/gif.jpg"/>
+            <itunes:keywords/>
+            <itunes:order>1</itunes:order>
+            <itunes:subtitle>Another Subtitle</itunes:subtitle>
+            <itunes:summary>Another Summary</itunes:summary>
+        </item>
+    <adori:interactive>yes</adori:interactive>
+    <ihr:interactive>yes</ihr:interactive>
+  </channel>
+</rss>
