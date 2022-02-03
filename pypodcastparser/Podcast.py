@@ -387,9 +387,9 @@ class Podcast:
             self.title = tag.string
         except AttributeError:
             self.title = None
-    
+
     def set_interactive(self, tag):
-        """Parses ihr-interactive tag and sets true if 'yes' False if otherwise"""
+        """Parses ihr-interactive and set value"""
         try:
             self.interactive = (tag.string.lower() == "yes")
         except AttributeError:
