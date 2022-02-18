@@ -227,6 +227,111 @@ class TestBasicFeed(unittest.TestCase):
     def test_time_published(self):
         self.assertTrue(isinstance(self.podcast.date_time, datetime.date))
 
+    def test_interactive(self):
+        self.assertFalse(self.podcast.interactive)
+
+class TestIHRInteractiveFeed(unittest.TestCase):
+
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        test_feeds_dir = os.path.join(test_dir, 'test_feeds')
+        basic_podcast_path = os.path.join(test_feeds_dir, 'ihr_interactive_podcast.rss')
+        basic_podcast_file = open(basic_podcast_path, "rb")
+        self.basic_podcast = basic_podcast_file.read()
+        self.podcast = Podcast.Podcast(self.basic_podcast)
+
+    def test_loding_of_basic_podcast(self):
+        self.assertIsNotNone(self.basic_podcast)
+
+    def test_dict(self):
+        feed_dict = self.podcast.to_dict()
+        self.assertTrue(type(feed_dict) is dict)
+
+    def test_copyright(self):
+        self.assertEqual(self.podcast.copyright, "basic copyright")
+
+    def test_description(self):
+        self.assertEqual(self.podcast.description, "basic description")
+
+    def test_image(self):
+        self.assertEqual(self.podcast.image_url, "https://test/giffy.jpg")
+
+    def test_itunes_author_name(self):
+        self.assertEqual(self.podcast.itunes_author_name,
+                         "basic itunes author")
+
+    def test_itunes_block(self):
+        self.assertEqual(self.podcast.itunes_block, False)
+
+    def test_itunes_categories(self):
+        self.assertTrue("News" in self.podcast.itunes_categories)
+        self.assertTrue("Business News" in self.podcast.itunes_categories)
+        self.assertTrue("Health" in self.podcast.itunes_categories)
+
+    def test_itunes_explicit(self):
+        self.assertEqual(self.podcast.itunes_explicit, "clean")
+
+    def test_itunes_complete(self):
+        self.assertEqual(self.podcast.itunes_complete, "yes")
+
+    def test_itunes_image(self):
+        self.assertEqual(self.podcast.itunes_image,
+                         "https://github.com/iheartradio/pyPodcastParser.jpg")
+
+    def test_itunes_categories_length(self):
+        number_of_categories = len(self.podcast.itunes_categories)
+        self.assertEqual(number_of_categories, 3)
+
+    def test_itunes_keywords(self):
+        self.assertTrue("Python" in self.podcast.itunes_keywords)
+        self.assertTrue("Testing" in self.podcast.itunes_keywords)
+
+    def test_itunes_keyword_length(self):
+        number_of_keywords = len(self.podcast.itunes_keywords)
+        self.assertEqual(number_of_keywords, 2)
+
+    def test_itunes_new_feed_url(self):
+        self.assertEqual(self.podcast.itunes_new_feed_url, "http://newlocation.com/example.rss")
+
+    def test_language(self):
+        self.assertEqual(self.podcast.language, "basic  language")
+
+    def test_last_build_date(self):
+        self.assertEqual(self.podcast.last_build_date,
+                         "Mon, 24 Mar 2008 23:30:07 GMT")
+
+    def test_link(self):
+        self.assertEqual(self.podcast.link,
+                         "https://github.com/iheartradio/pyPodcastParser")
+
+    def test_published_date(self):
+        self.assertEqual(self.podcast.published_date,
+                         "Mon, 24 Mar 2008 23:30:07 GMT")
+
+    def test_owner_name(self):
+        self.assertEqual(self.podcast.owner_name, "basic itunes owner name")
+
+    def test_owner_email(self):
+        self.assertEqual(self.podcast.owner_email, "basic itunes owner email")
+
+    def test_subtitle(self):
+        self.assertEqual(self.podcast.subtitle, "basic itunes subtitle")
+
+    def test_summary(self):
+        self.assertEqual(self.podcast.summary, "basic itunes summary")
+
+    def test_summary(self):
+        self.assertEqual(self.podcast.summary, "basic itunes summary")
+
+    def test_title(self):
+        self.assertEqual(self.podcast.title, "basic title")
+
+    def test_time_published(self):
+        self.assertTrue(isinstance(self.podcast.date_time, datetime.date))
+
+    def test_interactive(self):
+        self.assertTrue(self.podcast.interactive)
+
 
 class TestKeywordVariability(unittest.TestCase):
     def setUp(self):
@@ -408,6 +513,9 @@ class TestMissingInfoFeed(unittest.TestCase):
 
     def test_time_published(self):
         self.assertIsNone(self.podcast.date_time)
+    
+    def test_interactive(self):
+        self.assertFalse(self.podcast.interactive)
 
 
 class TestItunesBlockFeed(unittest.TestCase):
