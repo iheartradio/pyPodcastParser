@@ -38,6 +38,7 @@ class Item(object):
         content_encoded(str): The encoded content of the item
         published_date (str): Date item was published
         title (str): The title of item.
+        interactive(bool): This item is interactive
     """
 
     def __init__(self, soup):
@@ -65,6 +66,7 @@ class Item(object):
         self.published_date = None
         self.title = None
         self.date_time = None
+        self.interactive = None
 
         tag_methods = {
             (None, 'title'): self.set_title,
@@ -85,6 +87,8 @@ class Item(object):
             ('itunes', 'order'): self.set_itunes_order,
             ('itunes', 'subtitle'): self.set_itunes_subtitle,
             ('itunes', 'summary'): self.set_itunes_summary,
+            ('ihr', 'interactive'): self.set_interactive,
+
         }
 
         # Populate attributes based on feed content
@@ -144,6 +148,7 @@ class Item(object):
         item['description'] = self.description
         item['published_date'] = self.published_date
         item['title'] = self.title
+        item['interactive'] = self.interactive
         return item
 
     def set_rss_element(self):
@@ -290,3 +295,10 @@ class Item(object):
             self.itunes_summary = tag.string
         except AttributeError:
             self.itunes_summary = None
+
+    def set_interactive(self, tag):
+        """Parses author and set value."""
+        try:
+            self.interactive = (tag.string.lower() == "yes")
+        except AttributeError:
+            self.interactive = False

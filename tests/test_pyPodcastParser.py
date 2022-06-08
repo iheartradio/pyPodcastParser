@@ -513,7 +513,7 @@ class TestMissingInfoFeed(unittest.TestCase):
 
     def test_time_published(self):
         self.assertIsNone(self.podcast.date_time)
-    
+
     def test_interactive(self):
         self.assertFalse(self.podcast.interactive)
 
@@ -534,6 +534,42 @@ class TestItunesBlockFeed(unittest.TestCase):
 
     def test_itunes_explicit(self):
         self.assertEqual(self.podcast.itunes_explicit, "yes")
+
+class TestItunesEpisodes(unittest.TestCase):
+
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        test_feeds_dir = os.path.join(test_dir, 'test_feeds')
+        basic_podcast_path = os.path.join(test_feeds_dir, 'episode.rss')
+        basic_podcast_file = open(basic_podcast_path, "rb")
+        self.basic_podcast = basic_podcast_file.read()
+        self.podcast = Podcast.Podcast(self.basic_podcast)
+
+    def test_episode_meta_data_episode_type(self):
+        self.assertEqual(self.podcast.items[0].itunes_episode_type, "full")
+
+    def test_episode_meta_data_episode_num(self):
+        self.assertEqual(self.podcast.items[0].itunes_episode, '111')
+
+    def test_episode_meta_data_episode_season(self):
+        self.assertEqual(self.podcast.items[0].itunes_season,'3')
+
+    def test_episode_meta_data_pub_date(self):
+        self.assertEqual(self.podcast.items[0].published_date,'Mon, 30 May 2022 04:05:03 GMT')
+
+    def test_episode_meta_data_external_image_url(self):
+        self.assertEqual(self.podcast.items[0].itunes_image,"https://cdn.images.adorilabs.com/v1/df2e8faf-d164-4b52-b101-437415245524.png")
+
+#linktitle
+    def test_episode_meta_data_link_title(self):
+        self.assertEqual(self.podcast.items[0].itunes_season,'3')
+
+
+    def test_episode_meta_data_interactive(self):
+        self.assertEqual(self.podcast.items[0].interactive,True)
+
+
+
 
 
 if __name__ == '__main__':
