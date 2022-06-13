@@ -47,7 +47,7 @@
         </itunes:owner>
         <itunes:subtitle>basic itunes subtitle</itunes:subtitle>
         <itunes:summary>basic itunes summary</itunes:summary>
-
+        <itunes:type>FULL</itunes:type> 
         <item>
 
             <author>lawyer@boyer.net</author>

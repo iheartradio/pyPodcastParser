@@ -148,6 +148,9 @@ class TestBasicFeed(unittest.TestCase):
     def test_copyright(self):
         self.assertEqual(self.podcast.copyright, "basic copyright")
 
+    def test_type(self):
+        self.assertEqual(self.podcast.itunes_type, "full")
+
     def test_description(self):
         self.assertEqual(self.podcast.description, "basic description")
 
@@ -555,21 +558,30 @@ class TestItunesEpisodes(unittest.TestCase):
         self.assertEqual(self.podcast.items[0].itunes_season,'3')
 
     def test_episode_meta_data_pub_date(self):
-        self.assertEqual(self.podcast.items[0].published_date,'Mon, 30 May 2022 04:05:03 GMT')
+        self.assertEqual(self.podcast.items[0].published_date,'2022-30-05, 04:05:03')
 
     def test_episode_meta_data_external_image_url(self):
         self.assertEqual(self.podcast.items[0].itunes_image,"https://cdn.images.adorilabs.com/v1/df2e8faf-d164-4b52-b101-437415245524.png")
 
-#linktitle
     def test_episode_meta_data_link_title(self):
         self.assertEqual(self.podcast.items[0].itunes_season,'3')
 
+    def test_episode_meta_data_is_interactive(self):
+        self.assertEqual(self.podcast.items[0].is_interactive,True)
 
     def test_episode_meta_data_interactive(self):
         self.assertEqual(self.podcast.items[0].interactive,True)
 
+    def test_episode_meta_data_interactive(self):
+        self.assertEqual(self.podcast.items[0].itunes_duration,'2785')
 
+    def test_episode_meta_data_content_encoded(self):
+        self.assertEqual(self.podcast.items[0].content_encoded,'test')
 
+    def test_episode_meta_data_description(self):
+        self.assertEqual(self.podcast.items[0].description,'test')
+
+2785
 
 
 if __name__ == '__main__':

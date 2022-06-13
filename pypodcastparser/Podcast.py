@@ -58,6 +58,7 @@ class Podcast:
         subtitle (str): The feed subtitle
         title (str): The feed title
         interactive (boolean): Is an iheart podcast interactive
+        is_interactive (boolean): Is an iheart podcast interactive
     """
 
     def __init__(self, feed_content):
@@ -88,6 +89,7 @@ class Podcast:
         self.date_time = None
         self.itunes_type = None
         self.interactive = False
+        self.is_interactive = False
 
         self.set_soup()
         tag_methods = {
@@ -100,6 +102,7 @@ class Podcast:
             (None, 'pubDate'): self.set_published_date,
             (None, 'title'): self.set_title,
             (None, 'item'): self.add_item,
+            (None, 'is_interactive'): self.is_interactive,
             ('itunes', 'author'): self.set_itunes_author_name,
             ('itunes', 'type'): self.set_itunes_type,
             ('itunes', 'block'): self.set_itunes_block,
@@ -248,6 +251,7 @@ class Podcast:
         """Parses the type of show and sets value"""
         try:
             self.itunes_type = tag.string
+            self.itunes_type = self.itunes_type.lower()
         except AttributeError:
             self.itunes_type = None
 
@@ -392,5 +396,7 @@ class Podcast:
         """Parses ihr-interactive and set value"""
         try:
             self.interactive = (tag.string.lower() == "yes")
+            self.is_interactive = self.interactive
         except AttributeError:
             self.interactive = False
+            self.is_interactive = self.interactive

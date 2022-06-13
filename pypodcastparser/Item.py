@@ -1,5 +1,6 @@
 from bs4 import Tag
-from datetime import date
+
+import datetime
 import email.utils
 
 
@@ -39,6 +40,7 @@ class Item(object):
         published_date (str): Date item was published
         title (str): The title of item.
         interactive(bool): This item is interactive
+        is_interactive (boolean): Is an iheart podcast interactive
     """
 
     def __init__(self, soup):
@@ -64,9 +66,11 @@ class Item(object):
         self.itunes_subtitle = None
         self.itunes_summary = None
         self.published_date = None
+        self.published_date_string = None
         self.title = None
         self.date_time = None
         self.interactive = None
+        self.is_interactive = None
 
         tag_methods = {
             (None, 'title'): self.set_title,
@@ -75,6 +79,7 @@ class Item(object):
             (None, 'guid'): self.set_guid,
             (None, 'pubDate'): self.set_published_date,
             (None, 'enclosure'): self.set_enclosure,
+            (None, 'is_interactive'): self.is_interactive,
             ('content', 'encoded'): self.set_content_encoded,
             ('itunes', 'author'): self.set_itunes_author_name,
             ('itunes', 'episode'): self.set_itunes_episode,
@@ -107,11 +112,11 @@ class Item(object):
         self.set_dates_published()
 
     def set_time_published(self):
-        if self.published_date is None:
+        if self.published_date_string is None:
             self.time_published = None
             return
         try:
-            time_tuple = email.utils.parsedate_tz(self.published_date)
+            time_tuple = email.utils.parsedate_tz(self.published_date_string)
             self.time_published = email.utils.mktime_tz(time_tuple)
         except (TypeError, ValueError, IndexError):
             self.time_published = None
@@ -121,7 +126,7 @@ class Item(object):
             self.date_time = None
             return
         try:
-            self.date_time = date.fromtimestamp(self.time_published)
+            self.date_time = datetime.date.fromtimestamp(self.time_published)
         except ValueError:
             self.date_time = None
 
@@ -165,7 +170,10 @@ class Item(object):
     def set_description(self, tag):
         """Parses description and set value."""
         try:
-            self.description = tag.string
+            if (self.content_encoded is not None):
+                self.description = self.content_encoded
+            else:
+                self.description = tag.string
         except AttributeError:
             self.description = None
 
@@ -203,6 +211,10 @@ class Item(object):
         """Parses published date and set value."""
         try:
             self.published_date = tag.string
+            #Preserve the orignal tag for the start_date
+            self.published_date_string = tag.string
+            pubDate = datetime.datetime.strptime(self.published_date, "%a, %d %b %Y %I:%M:%S %Z")
+            self.published_date = datetime.datetime.strftime(pubDate,"%Y-%d-%m, %H:%M:%S")
         except AttributeError:
             self.published_date = None
 
@@ -238,6 +250,7 @@ class Item(object):
         """Parses the episode type and sets value"""
         try:
             self.itunes_episode_type = tag.string
+            self.itunes_episode_type = self.itunes_episode_type.lower()
         except AttributeError:
             self.itunes_episode_type = None
 
@@ -300,5 +313,7 @@ class Item(object):
         """Parses author and set value."""
         try:
             self.interactive = (tag.string.lower() == "yes")
+            self.is_interactive = self.interactive
         except AttributeError:
             self.interactive = False
+            self.is_interactive = self.interactive
