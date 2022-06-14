@@ -213,7 +213,7 @@ class Item(object):
             self.published_date = tag.string
             #Preserve the orignal tag for the start_date
             self.published_date_string = tag.string
-            pubDate = datetime.datetime.strptime(self.published_date, "%a, %d %b %Y %I:%M:%S %Z")
+            pubDate = datetime.datetime.strptime(self.published_date, "%a, %d %b %Y %H:%M:%S %Z")
             self.published_date = datetime.datetime.strftime(pubDate,"%Y-%d-%m, %H:%M:%S")
         except AttributeError:
             self.published_date = None

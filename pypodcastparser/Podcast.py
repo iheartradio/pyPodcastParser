@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup, Tag
-from datetime import date
+import datetime
 import email.utils
 from pypodcastparser.Item import Item
 
@@ -81,6 +81,7 @@ class Podcast:
         self.last_build_date = None
         self.link = None
         self.published_date = None
+        self.published_date_string = None
         self.summary = None
         self.owner_name = None
         self.owner_email = None
@@ -151,11 +152,11 @@ class Podcast:
         self.set_dates_published()
 
     def set_time_published(self):
-        if self.published_date is None:
+        if self.published_date_string is None:
             self.time_published = None
             return
         try:
-            time_tuple = email.utils.parsedate_tz(self.published_date)
+            time_tuple = email.utils.parsedate_tz(self.published_date_string)
             self.time_published = email.utils.mktime_tz(time_tuple)
         except (TypeError, ValueError, IndexError):
             self.time_published = None
@@ -165,7 +166,7 @@ class Podcast:
             self.date_time = None
         else:
             try:
-                self.date_time = date.fromtimestamp(self.time_published)
+                self.date_time = datetime.date.fromtimestamp(self.time_published)
             except ValueError:
                 self.date_time = None
 
@@ -357,6 +358,10 @@ class Podcast:
         """Parses published date and set value"""
         try:
             self.published_date = tag.string
+            #Preserve the orignal tag for the start_date
+            self.published_date_string = tag.string
+            pubDate = datetime.datetime.strptime(self.published_date, "%a, %d %b %Y %H:%M:%S %Z")
+            self.published_date = datetime.datetime.strftime(pubDate,"%Y-%d-%m, %H:%M:%S")
         except AttributeError:
             self.published_date = None
 

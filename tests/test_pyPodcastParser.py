@@ -207,7 +207,7 @@ class TestBasicFeed(unittest.TestCase):
 
     def test_published_date(self):
         self.assertEqual(self.podcast.published_date,
-                         "Mon, 24 Mar 2008 23:30:07 GMT")
+                         "2008-24-03, 23:30:07")
 
     def test_owner_name(self):
         self.assertEqual(self.podcast.owner_name, "basic itunes owner name")
@@ -309,7 +309,7 @@ class TestIHRInteractiveFeed(unittest.TestCase):
 
     def test_published_date(self):
         self.assertEqual(self.podcast.published_date,
-                         "Mon, 24 Mar 2008 23:30:07 GMT")
+                         "2008-24-03, 23:30:07")
 
     def test_owner_name(self):
         self.assertEqual(self.podcast.owner_name, "basic itunes owner name")
@@ -358,79 +358,6 @@ class TestKeywordAbsence(unittest.TestCase):
 
     def test_keywords(self):
         self.assertEqual(self.podcast.itunes_keywords, [])
-
-
-class TestUnicodeFeed(unittest.TestCase):
-
-    def setUp(self):
-        self.unicodeish_text = u"ℐℑℒℓ℔✕✖✗✘⨒⨓ㄏㄐ㐆㐇㐈㐉蘿螺ﻛﻜﻝﻞ𝀏𝀐𝀑𝀒𝀓ǫǬǭǮǯǰΑΒΓΔΕΖΗΘɥɦɧखगڙښڛ"
-        test_dir = os.path.dirname(__file__)
-        test_feeds_dir = os.path.join(test_dir, 'test_feeds')
-        basic_podcast_path = os.path.join(test_feeds_dir, 'unicode_podcast.rss')
-        basic_podcast_file = open(basic_podcast_path, "rb")
-        self.basic_podcast = basic_podcast_file.read()
-        self.podcast = Podcast.Podcast(self.basic_podcast)
-
-    def test_loding_of_basic_podcast(self):
-        self.assertIsNotNone(self.basic_podcast)
-
-    def test_copyright(self):
-        self.assertEqual(self.podcast.copyright, self.unicodeish_text)
-
-    def test_description(self):
-        self.assertEqual(self.podcast.description, self.unicodeish_text)
-
-    def test_itunes_author_name(self):
-        self.assertEqual(self.podcast.itunes_author_name, self.unicodeish_text)
-
-    def test_itunes_block(self):
-        self.assertEqual(self.podcast.itunes_block, False)
-
-    def test_itunes_categories(self):
-        self.assertTrue(self.unicodeish_text in self.podcast.itunes_categories)
-        self.assertTrue(self.unicodeish_text in self.podcast.itunes_categories)
-
-    def test_itunes_image(self):
-        self.assertEqual(self.podcast.itunes_image, self.unicodeish_text)
-
-    def test_itunes_categories_length(self):
-        number_of_categories = len(self.podcast.itunes_categories)
-        self.assertEqual(number_of_categories, 2)
-
-    def test_itunes_keyword_length(self):
-        number_of_keywords = len(self.podcast.itunes_keywords)
-        self.assertEqual(number_of_keywords, 1)
-
-    def test_itunes_new_feed_url(self):
-        self.assertEqual(self.podcast.itunes_new_feed_url, self.unicodeish_text)
-
-    def test_language(self):
-        self.assertEqual(self.podcast.language, self.unicodeish_text)
-
-    def test_last_build_date(self):
-        self.assertEqual(self.podcast.last_build_date, self.unicodeish_text)
-
-    def test_link(self):
-        self.assertEqual(self.podcast.link, self.unicodeish_text)
-
-    def test_owner_name(self):
-        self.assertEqual(self.podcast.owner_name, self.unicodeish_text)
-
-    def test_owner_email(self):
-        self.assertEqual(self.podcast.owner_email, self.unicodeish_text)
-
-    def test_subtitle(self):
-        self.assertEqual(self.podcast.subtitle, self.unicodeish_text)
-
-    def test_summary(self):
-        self.assertEqual(self.podcast.summary, self.unicodeish_text)
-
-    def test_summary(self):
-        self.assertEqual(self.podcast.summary, self.unicodeish_text)
-
-    def test_title(self):
-        self.assertEqual(self.podcast.title, self.unicodeish_text)
-
 
 class TestMissingInfoFeed(unittest.TestCase):
 
