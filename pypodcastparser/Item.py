@@ -2,6 +2,7 @@ from bs4 import Tag
 
 import datetime
 import email.utils
+from dateutil.parser import parse
 
 
 class Item(object):
@@ -213,7 +214,8 @@ class Item(object):
             self.published_date = tag.string
             #Preserve the orignal tag for the start_date
             self.published_date_string = tag.string
-            pubDate = datetime.datetime.strptime(self.published_date, "%a, %d %b %Y %H:%M:%S %Z")
+            pubDate = parse(self.published_date)
+            #pubDate = datetime.datetime.strptime(self.published_date, "%a, %d %b %Y %H:%M:%S %Z")
             self.published_date = datetime.datetime.strftime(pubDate,"%Y-%d-%m, %H:%M:%S")
         except AttributeError:
             self.published_date = None
