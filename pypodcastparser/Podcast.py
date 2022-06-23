@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup, Tag
-from datetime import date
+import datetime
 import email.utils
 from pypodcastparser.Item import Item
 
@@ -58,6 +58,7 @@ class Podcast:
         subtitle (str): The feed subtitle
         title (str): The feed title
         interactive (boolean): Is an iheart podcast interactive
+        is_interactive (boolean): Is an iheart podcast interactive
     """
 
     def __init__(self, feed_content):
@@ -80,6 +81,7 @@ class Podcast:
         self.last_build_date = None
         self.link = None
         self.published_date = None
+        self.published_date_string = None
         self.summary = None
         self.owner_name = None
         self.owner_email = None
@@ -88,6 +90,7 @@ class Podcast:
         self.date_time = None
         self.itunes_type = None
         self.interactive = False
+        self.is_interactive = False
 
         self.set_soup()
         tag_methods = {
@@ -100,6 +103,7 @@ class Podcast:
             (None, 'pubDate'): self.set_published_date,
             (None, 'title'): self.set_title,
             (None, 'item'): self.add_item,
+            (None, 'is_interactive'): self.is_interactive,
             ('itunes', 'author'): self.set_itunes_author_name,
             ('itunes', 'type'): self.set_itunes_type,
             ('itunes', 'block'): self.set_itunes_block,
@@ -148,11 +152,11 @@ class Podcast:
         self.set_dates_published()
 
     def set_time_published(self):
-        if self.published_date is None:
+        if self.published_date_string is None:
             self.time_published = None
             return
         try:
-            time_tuple = email.utils.parsedate_tz(self.published_date)
+            time_tuple = email.utils.parsedate_tz(self.published_date_string)
             self.time_published = email.utils.mktime_tz(time_tuple)
         except (TypeError, ValueError, IndexError):
             self.time_published = None
@@ -162,7 +166,7 @@ class Podcast:
             self.date_time = None
         else:
             try:
-                self.date_time = date.fromtimestamp(self.time_published)
+                self.date_time = datetime.date.fromtimestamp(self.time_published)
             except ValueError:
                 self.date_time = None
 
@@ -248,6 +252,7 @@ class Podcast:
         """Parses the type of show and sets value"""
         try:
             self.itunes_type = tag.string
+            self.itunes_type = self.itunes_type.lower()
         except AttributeError:
             self.itunes_type = None
 
@@ -273,9 +278,7 @@ class Podcast:
         # get subcategories
         for content in tag.contents:
             if (
-                isinstance(content, Tag)
-                and content.prefix == 'itunes'
-                and content.name == 'category'
+                isinstance(content, Tag) and content.prefix == 'itunes' and content.name == 'category'
             ):
                 self.add_itunes_category(content)
 
@@ -353,6 +356,9 @@ class Podcast:
         """Parses published date and set value"""
         try:
             self.published_date = tag.string
+            self.published_date_string = tag.string
+            pubdate = datetime.datetime.strptime(self.published_date, "%a, %d %b %Y %H:%M:%S %Z")
+            self.published_date = datetime.datetime.strftime(pubdate, "%Y-%d-%m, %H:%M:%S")
         except AttributeError:
             self.published_date = None
 
@@ -392,5 +398,7 @@ class Podcast:
         """Parses ihr-interactive and set value"""
         try:
             self.interactive = (tag.string.lower() == "yes")
+            self.is_interactive = self.interactive
         except AttributeError:
             self.interactive = False
+            self.is_interactive = self.interactive

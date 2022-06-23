@@ -2,7 +2,7 @@
 language: python
 
 # Run the test runner using the same version of Python we use.
-python: 3.7
+python: 3.9.1
 
 services:
   - docker
@@ -11,14 +11,14 @@ services:
 install:
   - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
   - unzip awscliv2.zip
-  - sudo ./aws/install 
+  - sudo ./aws/install
   - pip install tox
 
 jobs:
   include:
     - stage: test
       name: "Tests"
-      env: TOX_ENV=py37
+      env: TOX_ENV=py39
       script: tox -e $TOX_ENV
     - stage: pep8
       name: "Pep8 Check"
