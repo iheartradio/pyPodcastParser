@@ -278,9 +278,7 @@ class Podcast:
         # get subcategories
         for content in tag.contents:
             if (
-                isinstance(content, Tag)
-                and content.prefix == 'itunes'
-                and content.name == 'category'
+                isinstance(content, Tag) and content.prefix == 'itunes' and content.name == 'category'
             ):
                 self.add_itunes_category(content)
 
@@ -358,10 +356,9 @@ class Podcast:
         """Parses published date and set value"""
         try:
             self.published_date = tag.string
-            #Preserve the orignal tag for the start_date
             self.published_date_string = tag.string
-            pubDate = datetime.datetime.strptime(self.published_date, "%a, %d %b %Y %H:%M:%S %Z")
-            self.published_date = datetime.datetime.strftime(pubDate,"%Y-%d-%m, %H:%M:%S")
+            pubdate = datetime.datetime.strptime(self.published_date, "%a, %d %b %Y %H:%M:%S %Z")
+            self.published_date = datetime.datetime.strftime(pubdate, "%Y-%d-%m, %H:%M:%S")
         except AttributeError:
             self.published_date = None
 
