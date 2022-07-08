@@ -133,28 +133,22 @@ class Item(object):
 
     def to_dict(self):
         item = {}
-        item['author'] = self.author
-        item['enclosure_url'] = self.enclosure_url
-        item['enclosure_type'] = self.enclosure_type
-        item['enclosure_length'] = self.enclosure_length
-        item['enclosure_type'] = self.enclosure_type
-        item['guid'] = self.guid
-        item['itunes_author_name'] = self.itunes_author_name
-        item['itunes_block'] = self.itunes_block
-        item['itunes_duration'] = self.itunes_duration
-        item['itunes_explicit'] = self.itunes_explicit
-        item['itunes_episode'] = self.itunes_episode
-        item['itunes_season'] = self.itunes_season
-        item['itunes_episode_type'] = self.itunes_episode_type
-        item['itunes_image'] = self.itunes_image
-        item['itunes_order'] = self.itunes_order
-        item['itunes_subtitle'] = self.itunes_subtitle
-        item['itunes_summary'] = self.itunes_summary
-        item['content_encoded'] = self.content_encoded
+
+        item['external_id'] = self.guid
+        item['episode_duration'] = self.itunes_duration
+        item['is_explicit'] = self.itunes_explicit
+        item['episode_number'] = self.itunes_episode
+        item['episode_season'] = self.itunes_season
+        item['episode_type'] = self.itunes_episode_type
+        item['episode_image_url'] = self.itunes_image
+        item['episode_subtitle'] = self.itunes_subtitle
         item['description'] = self.description
-        item['published_date'] = self.published_date
-        item['title'] = self.title
+        item['original_air_date'] = self.published_date
+        item['episode_title'] = self.title
         item['interactive'] = self.interactive
+        item['external_url'] = self.enclosure_url
+        item['episode_linktitle'] = episode.title
+        @TODO episode link title formated
         return item
 
     def set_rss_element(self):
