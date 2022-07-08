@@ -3,7 +3,7 @@ from bs4 import Tag
 import datetime
 import email.utils
 from dateutil.parser import parse
-
+import re
 
 class Item(object):
     """Parses an xml rss feed
@@ -133,6 +133,8 @@ class Item(object):
 
     def to_dict(self):
         item = {}
+        formatted_title = self.title.lower().replace(" ", "")
+        linktitle= re.sub('[^A-Za-z0-9]',"",formatted_title)
 
         item['external_id'] = self.guid
         item['episode_duration'] = self.itunes_duration
@@ -147,8 +149,8 @@ class Item(object):
         item['episode_title'] = self.title
         item['interactive'] = self.interactive
         item['external_url'] = self.enclosure_url
-        item['episode_linktitle'] = episode.title
-        @TODO episode link title formated
+        item['episode_linktitle'] = linktitle
+
         return item
 
     def set_rss_element(self):
