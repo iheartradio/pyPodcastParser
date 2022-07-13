@@ -4,7 +4,7 @@ import datetime
 import email.utils
 from dateutil.parser import parse
 import re
-
+import time
 class Item(object):
     """Parses an xml rss feed
 
@@ -207,7 +207,7 @@ class Item(object):
             self.published_date = tag.string
             self.published_date_string = tag.string
             pubdate = parse(self.published_date)
-            self.published_date = datetime.datetime.strftime(pubdate, "%Y-%d-%m, %H:%M:%S")
+            self.published_date = datetime.datetime.strftime(pubdate, "%Y-%m-%d, %H:%M:%S")
         except AttributeError:
             self.published_date = None
 
@@ -261,7 +261,33 @@ class Item(object):
     def set_itunes_duration(self, tag):
         """Parses duration from itunes tags and sets value"""
         try:
-            self.itunes_duration = tag.string
+            t = tag.string.split(':')
+            duration = 0
+
+            if(len(t) == 3):
+                for i,v in enumerate(t):
+                    if(i  == 0):
+                        duration += int(t[0]) * 3600
+                    elif(i  == 1):
+                        duration += int(t[1]) * 60
+                    else:
+                        duration += int(t[2])
+                self.itunes_duration = duration
+
+            elif(len(t) == 2):
+                for i,v in enumerate(t):
+                    if(i  == 0):
+                        duration += int(t[0]) * 60
+                    else:
+                        duration += int(t[1])
+
+                self.itunes_duration = duration
+            else:
+                self.itunes_duration = tag.string
+
+
+
+
         except AttributeError:
             self.itunes_duration = None
 
