@@ -139,9 +139,9 @@ class Item(object):
         item['episode_number'] = self.itunes_episode
         item['episode_season'] = self.itunes_season
         item['episode_type'] = self.itunes_episode_type
-        item['episode_image_url'] = self.itunes_image
+        item['external_image_url'] = self.itunes_image
         item['episode_subtitle'] = self.itunes_subtitle
-        item['description'] = self.description
+        item['episode_description'] = self.description
         item['original_air_date'] = self.published_date
         item['episode_title'] = self.title
         item['interactive'] = self.interactive
