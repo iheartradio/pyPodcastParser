@@ -166,7 +166,7 @@ class Item(object):
         """Parses description and set value."""
         try:
             if (self.content_encoded is not None):
-                #Strip html tags
+                #Strip html
                 p = re.compile(r'<.*?>')
                 self.description = p.sub('', self.content_encoded)
             else:
@@ -209,8 +209,13 @@ class Item(object):
         try:
             self.published_date = tag.string
             self.published_date_string = tag.string
-            pubdate = parse(self.published_date)
-            self.published_date = datetime.datetime.strftime(pubdate, "%Y-%m-%d, %H:%M:%S")
+            a = tag.string.split(":")
+            b = a[2]
+            seconds = b[:2]
+            a[0] += ":"+a[1]
+            a[0] += ":"+seconds
+
+            self.published_date = datetime.datetime.strptime(a[0], "%a, %d %b %Y %H:%M:%S")
         except AttributeError:
             self.published_date = None
 
