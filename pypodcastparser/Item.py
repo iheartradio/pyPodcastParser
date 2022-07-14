@@ -143,6 +143,7 @@ class Item(object):
         item['episode_subtitle'] = self.itunes_subtitle
         item['episode_description'] = self.description
         item['original_air_date'] = self.published_date
+        item['start_date'] = self.published_date
         item['episode_title'] = self.title
         item['interactive'] = self.interactive
         item['external_url'] = self.enclosure_url
@@ -165,7 +166,9 @@ class Item(object):
         """Parses description and set value."""
         try:
             if (self.content_encoded is not None):
-                self.description = self.content_encoded
+                #Strip html tags
+                p = re.compile(r'<.*?>')
+                self.description = p.sub('', self.content_encoded)
             else:
                 self.description = tag.string
         except AttributeError:
@@ -261,9 +264,10 @@ class Item(object):
     def set_itunes_duration(self, tag):
         """Parses duration from itunes tags and sets value"""
         try:
-            t = tag.string.split(':')
+            #remove milli seconds
+            time_no_mil = tag.string.split('.')
+            t = time_no_mil[0].split(':')
             duration = 0
-
             if(len(t) == 3):
                 for i,v in enumerate(t):
                     if(i  == 0):
