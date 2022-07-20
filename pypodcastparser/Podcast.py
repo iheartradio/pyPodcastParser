@@ -363,8 +363,7 @@ class Podcast:
             a[0] += ":"+a[1]
             a[0] += ":"+seconds
 
-            self.published_date = datetime.datetime.strptime(a[0], "%a, %d %b %Y %H:%M:%S")
-            #self.published_date = datetime.datetime.strftime(pubdate, "%Y-%m-%d, %H:%M:%S")
+            self.published_date = str(datetime.datetime.strptime(a[0], "%a, %d %b %Y %H:%M:%S"))
         except AttributeError:
             self.published_date = None
 

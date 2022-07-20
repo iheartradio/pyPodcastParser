@@ -165,12 +165,12 @@ class Item(object):
     def set_description(self, tag):
         """Parses description and set value."""
         try:
+            p = re.compile(r'<.*?>')
             if (self.content_encoded is not None):
                 #Strip html
-                p = re.compile(r'<.*?>')
                 self.description = p.sub('', self.content_encoded)
             else:
-                self.description = tag.string
+                self.description =  p.sub('', tag.string)
         except AttributeError:
             self.description = None
 
@@ -215,7 +215,7 @@ class Item(object):
             a[0] += ":"+a[1]
             a[0] += ":"+seconds
 
-            self.published_date = datetime.datetime.strptime(a[0], "%a, %d %b %Y %H:%M:%S")
+            self.published_date = str(datetime.datetime.strptime(a[0], "%a, %d %b %Y %H:%M:%S"))
         except AttributeError:
             self.published_date = None
 
@@ -304,7 +304,13 @@ class Item(object):
         """Parses explicit from itunes item tags and sets value"""
         try:
             self.itunes_explicit = tag.string
-            self.itunes_explicit = self.itunes_explicit.lower()
+            if(self.itunes_explicit.lower() == 'no'):
+                self.itunes_explicit = False
+            elif(self.itunes_explicit.lower() == 'yes'):
+                self.itunes_explicit = True
+            else:
+                self.itunes_explicit = self.itunes_explicit.lower()
+
         except AttributeError:
             self.itunes_explicit = None
 

@@ -54,7 +54,7 @@ class TestBasicFeedItemBlocked(unittest.TestCase):
         self.assertEqual(self.podcast.itunes_block, True)
 
     def test_item_itunes_explicit(self):
-        self.assertEqual(self.podcast.items[0].itunes_explicit, "yes")
+        self.assertEqual(self.podcast.items[0].itunes_explicit, True)
         self.assertEqual(self.podcast.items[1].itunes_explicit, "highly offensive")
 
 
@@ -88,11 +88,11 @@ class TestBasicFeedItems(unittest.TestCase):
         self.assertEqual(self.podcast.itunes_block, False)
 
     def test_item_itunes_duration(self):
-        self.assertEqual(self.podcast.items[0].itunes_duration, "1:05")
-        self.assertEqual(self.podcast.items[1].itunes_duration, "1:11:05")
+        self.assertEqual(self.podcast.items[0].itunes_duration, 65)
+        self.assertEqual(self.podcast.items[1].itunes_duration, 4265)
 
     def test_item_itunes_explicit(self):
-        self.assertEqual(self.podcast.items[0].itunes_explicit, "no")
+        self.assertEqual(self.podcast.items[0].itunes_explicit, False)
         self.assertEqual(self.podcast.items[1].itunes_explicit, "clean")
 
     def test_item_itunes_order(self):
@@ -207,7 +207,7 @@ class TestBasicFeed(unittest.TestCase):
 
     def test_published_date(self):
         self.assertEqual(self.podcast.published_date,
-                         "2008-24-03, 23:30:07")
+                         "2008-03-24 23:30:07")
 
     def test_owner_name(self):
         self.assertEqual(self.podcast.owner_name, "basic itunes owner name")
@@ -309,7 +309,7 @@ class TestIHRInteractiveFeed(unittest.TestCase):
 
     def test_published_date(self):
         self.assertEqual(self.podcast.published_date,
-                         "2008-24-03, 23:30:07")
+                         "2008-03-24 23:30:07")
 
     def test_owner_name(self):
         self.assertEqual(self.podcast.owner_name, "basic itunes owner name")
@@ -477,7 +477,8 @@ class TestItunesEpisodes(unittest.TestCase):
 
     def test_episode_to_dict(self):
         ep_dict = self.podcast.items[0].to_dict()
-        self.assertEqual(str(ep_dict),"{'external_id': 'adori-8d2abc8f-65a4-401f-a6ef-45d86a24e0be', 'episode_duration': '2785', 'is_explicit': 'false', 'episode_number': '111', 'episode_season': '3', 'episode_type': 'full', 'episode_image_url': 'https://cdn.images.adorilabs.com/v1/df2e8faf-d164-4b52-b101-437415245524.png', 'episode_subtitle': 'News & Headlines, Early June 2022', 'description': 'test', 'original_air_date': '2022-30-05, 04:05:03', 'episode_title': 'CORVETTE TODAY #111 - Corvette News & Headlines, Early June 2020', 'interactive': True, 'external_url': 'https://static.adorilabs.com/audiotracks/episode--ep_esWWrdyNUgFEakL0TmTuLX9e0xjg0eBHx/v1/17773-ID6aGhYYXWHO7v5v-9b049e80-b77c-4069-8121-4b2fcc2a8b45-12017.mp3', 'episode_linktitle': 'corvettetoday111corvettenewsheadlinesearlyjune2020'}")
+        print(str(ep_dict))
+        self.assertEqual(str(ep_dict),"{'external_id': 'adori-8d2abc8f-65a4-401f-a6ef-45d86a24e0be', 'episode_duration': '2785', 'is_explicit': 'false', 'episode_number': '111', 'episode_season': '3', 'episode_type': 'full', 'external_image_url': 'https://cdn.images.adorilabs.com/v1/df2e8faf-d164-4b52-b101-437415245524.png', 'episode_subtitle': 'News & Headlines, Early June 2022', 'episode_description': 'test', 'original_air_date': '2022-05-30 04:05:03', 'start_date': '2022-05-30 04:05:03', 'episode_title': 'CORVETTE TODAY #111 - Corvette News & Headlines, Early June 2020', 'interactive': True, 'external_url': 'https://static.adorilabs.com/audiotracks/episode--ep_esWWrdyNUgFEakL0TmTuLX9e0xjg0eBHx/v1/17773-ID6aGhYYXWHO7v5v-9b049e80-b77c-4069-8121-4b2fcc2a8b45-12017.mp3'}")
 
 
     def test_episode_meta_data_episode_type(self):
@@ -490,7 +491,7 @@ class TestItunesEpisodes(unittest.TestCase):
         self.assertEqual(self.podcast.items[0].itunes_season,'3')
 
     def test_episode_meta_data_pub_date(self):
-        self.assertEqual(self.podcast.items[0].published_date,'2022-30-05, 04:05:03')
+        self.assertEqual(self.podcast.items[0].published_date,'2022-05-30 04:05:03')
 
     def test_episode_meta_data_external_image_url(self):
         self.assertEqual(self.podcast.items[0].itunes_image,"https://cdn.images.adorilabs.com/v1/df2e8faf-d164-4b52-b101-437415245524.png")
