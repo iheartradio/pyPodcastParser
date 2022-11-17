@@ -165,12 +165,7 @@ class Item(object):
     def set_description(self, tag):
         """Parses description and set value."""
         try:
-            p = re.compile(r'<.*?>')
-            if (self.content_encoded is not None):
-                #Strip html
-                self.description = p.sub('', self.content_encoded)
-            else:
-                self.description =  p.sub('', tag.string)
+            self.description = tag.string
         except AttributeError:
             self.description = None
 
