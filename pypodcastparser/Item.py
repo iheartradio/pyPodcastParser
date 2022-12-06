@@ -242,7 +242,7 @@ class Item(object):
         try:
             self.itunes_season = tag.string
             if -32767 > self.itunes_season or self.itunes_season > 32767 or self.itunes_season == None:
-		        self.itunes_season = 0
+                self.itunes_season = 0
         except AttributeError:
             self.itunes_season = None
 
