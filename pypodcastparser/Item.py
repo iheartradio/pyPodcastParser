@@ -252,7 +252,7 @@ class Item(object):
             self.itunes_episode_type = tag.string
             self.itunes_episode_type = self.itunes_episode_type.lower()
         except AttributeError:
-            self.itunes_episode_type = 0
+            self.itunes_episode_type = None
 
     def set_itunes_block(self, tag):
         """Check and see if item is blocked from iTunes and sets value"""
