@@ -235,7 +235,7 @@ class Item(object):
             if -32767 >= int(self.itunes_episode) or int(self.itunes_episode) >= 32767 or not self.itunes_episode:
                 self.itunes_episode = 0
         except AttributeError:
-            self.itunes_episode = None
+            self.itunes_episode = 0
 
     def set_itunes_season(self, tag):
         """Parses the episode season and sets value"""
