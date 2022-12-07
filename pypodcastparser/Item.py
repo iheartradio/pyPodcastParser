@@ -232,7 +232,7 @@ class Item(object):
         """Parses the episode number and sets value"""
         try:
             self.itunes_episode = tag.string
-            if -32767 >= int(self.itunes_episode) or int(self.itunes_episode) >= 32767 or self.itunes_episode == "":
+            if -32767 >= int(self.itunes_episode) or int(self.itunes_episode) >= 32767 or not self.itunes_episode:
                 self.itunes_episode = 0
         except AttributeError:
             self.itunes_episode = None
@@ -241,7 +241,7 @@ class Item(object):
         """Parses the episode season and sets value"""
         try:
             self.itunes_season = tag.string
-            if -32767 >= int(self.itunes_season) or int(self.itunes_season) >= 32767 or self.itunes_season == "":
+            if -32767 >= int(self.itunes_season) or int(self.itunes_season) >= 32767 or not self.itunes_season:
                 self.itunes_season = 0
         except AttributeError:
             self.itunes_season = 0
