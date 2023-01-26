@@ -512,8 +512,26 @@ class TestItunesEpisodes(unittest.TestCase):
         self.assertEqual(self.podcast.items[0].content_encoded,'test')
 
     def test_episode_meta_data_description(self):
-        self.assertEqual(self.podcast.items[0].description,'test')
+        self.assertEqual(self.podcast.items[0].description,'description')
 
 
+class TestItunesEpisodesParsing(unittest.TestCase):
+
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        test_feeds_dir = os.path.join(test_dir, 'test_feeds')
+        basic_podcast_path = os.path.join(test_feeds_dir, 'episode_parsing.rss')
+        basic_podcast_file = open(basic_podcast_path, "rb")
+        self.basic_podcast = basic_podcast_file.read()
+        self.podcast = Podcast.Podcast(self.basic_podcast)
+
+#    def test_episode_parsing_meta_data_interactive(self):
+#        self.assertEqual(self.podcast.items[0].itunes_duration,'2785')
+
+    def test_episode_parsing_meta_data_pub_date(self):
+        self.assertEqual(self.podcast.items[0].published_date,'2023-01-20 08:45:00')
+
+#    def test_episode_parsing_meta_data_description(self):
+#        self.assertEqual(self.podcast.items[0].description,'test')
 if __name__ == '__main__':
     unittest.main()

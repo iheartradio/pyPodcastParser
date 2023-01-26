@@ -173,6 +173,8 @@ class Item(object):
         """Parses content_encoded and set value."""
         try:
             self.content_encoded = tag.string
+            if(self.description == None):
+                self.description = self.content_encoded
         except AttributeError:
             self.content_encoded = None
 
@@ -204,15 +206,47 @@ class Item(object):
         try:
             self.published_date = tag.string
             self.published_date_string = tag.string
-            a = tag.string.split(":")
-            b = a[2]
-            seconds = b[:2]
-            a[0] += ":"+a[1]
-            a[0] += ":"+seconds
 
-            self.published_date = str(datetime.datetime.strptime(a[0], "%a, %d %b %Y %H:%M:%S"))
+            deconstructed_date = self.published_date_string.split(" ")
+
+
+            if(re.match("^[a-zA-Z]{3}$",deconstructed_date[-1])):
+                deconstructed_date.pop()
+
+            regex_array = ["^[a-zA-Z]{3},$","^\d{1,2}$","^[a-zA-Z]{3}$","^\d{4}$","^\d\d:\d\d","^[a-zA-Z]{3}$"]
+            new_array = []
+
+
+            for i,v in enumerate(deconstructed_date):
+                if(re.match(regex_array[i],v)):
+                    new_array.append(v)
+                else:
+                    for x,z in enumerate(deconstructed_date):
+                        if(re.match(regex_array[i],z)):
+                            new_array.append(z)
+                            break
+            date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
+
+            time = date_string.split(":")
+            if(len(time) == 2):
+                minutes = time[1].split(" ")
+                minutes[0]+=":00"
+                time[0] += ":"+minutes[0]
+                self.published_date = str(datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S"))
+            elif(len(time) == 3):
+                time[0] += ":"+time[1]
+                seconds = time[2]
+                seconds_string = seconds[:2]
+                time[0] += ":"+seconds_string
+                self.published_date = str(datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S"))
+            else:
+                now = datetime.now(timezone.utc)
+                date = now.strftime("%a, %d %b %Y %H:%M:%S")
+                self.published_date = date
         except AttributeError:
-            self.published_date = None
+            now = datetime.now(timezone.utc)
+            date = now.strftime("%a, %d %b %Y %H:%M:%S")
+            self.published_date = date
 
     def set_title(self, tag):
         """Parses title and set value."""
@@ -232,7 +266,8 @@ class Item(object):
         """Parses the episode number and sets value"""
         try:
             self.itunes_episode = tag.string
-            if -32767 >= int(self.itunes_episode) or int(self.itunes_episode) >= 32767 or not self.itunes_episode:
+
+            if -32767 >= int(float(self.itunes_episode)) or int(float(self.itunes_episode)) >= 32767 or not self.itunes_episode:
                 self.itunes_episode = 0
         except AttributeError:
             self.itunes_episode = 0
@@ -241,7 +276,7 @@ class Item(object):
         """Parses the episode season and sets value"""
         try:
             self.itunes_season = tag.string
-            if -32767 >= int(self.itunes_season) or int(self.itunes_season) >= 32767 or not self.itunes_season:
+            if -32767 >= int(float(self.itunes_season)) or int(float(self.itunes_season)) >= 32767 or not self.itunes_season:
                 self.itunes_season = 0
         except AttributeError:
             self.itunes_season = 0
