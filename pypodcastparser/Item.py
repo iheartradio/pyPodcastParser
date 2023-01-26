@@ -201,7 +201,7 @@ class Item(object):
             self.guid = tag.string
         except AttributeError:
             self.guid = None
-
+#TODO convert to one timezone
     def set_published_date(self, tag):
         """Parses published date and set value."""
         try:
@@ -214,7 +214,7 @@ class Item(object):
             if(re.match("^[a-zA-Z]{3}$",deconstructed_date[-1])):
                 deconstructed_date.pop()
 
-            regex_array = ["^[a-zA-Z]{3},$","^\d{1,2}$","^[a-zA-Z]{3}$","^\d{4}$","^\d\d:\d\d","^[a-zA-Z]{3}$"]
+            regex_array = ["^[a-zA-Z]{3},$","^\d{1,2}$","^[a-zA-Z]{3}$","^\d{4}$","^\d\d:\d\d"]
             new_array = []
 
 
