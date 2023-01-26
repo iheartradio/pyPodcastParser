@@ -1,6 +1,7 @@
 from bs4 import Tag
 
 import datetime
+from datetime import timezone
 import email.utils
 from dateutil.parser import parse
 import re
@@ -227,6 +228,10 @@ class Item(object):
                             break
             date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
 
+
+            if(len(new_array) != 5):
+                raise AttributeError
+
             time = date_string.split(":")
             if(len(time) == 2):
                 minutes = time[1].split(" ")
@@ -240,11 +245,11 @@ class Item(object):
                 time[0] += ":"+seconds_string
                 self.published_date = str(datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S"))
             else:
-                now = datetime.now(timezone.utc)
+                now = datetime.datetime.now(timezone.utc)
                 date = now.strftime("%a, %d %b %Y %H:%M:%S")
                 self.published_date = date
         except AttributeError:
-            now = datetime.now(timezone.utc)
+            now = datetime.datetime.now(timezone.utc)
             date = now.strftime("%a, %d %b %Y %H:%M:%S")
             self.published_date = date
 
