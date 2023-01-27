@@ -272,19 +272,19 @@ class Item(object):
         try:
             self.itunes_episode = tag.string
 
-            if -32767 >= int(float(self.itunes_episode)) or int(float(self.itunes_episode)) >= 32767 or not self.itunes_episode:
-                self.itunes_episode = 0
+            if self.itunes_episode == "" or self.itunes_episode == None:
+                self.itunes_episode = '0'
         except AttributeError:
-            self.itunes_episode = 0
+            self.itunes_episode = '0'
 
     def set_itunes_season(self, tag):
         """Parses the episode season and sets value"""
         try:
             self.itunes_season = tag.string
-            if -32767 >= int(float(self.itunes_season)) or int(float(self.itunes_season)) >= 32767 or not self.itunes_season:
-                self.itunes_season = 0
+            if self.itunes_season == "" or self.itunes_season == None:
+                self.itunes_season = '0'
         except AttributeError:
-            self.itunes_season = 0
+            self.itunes_season = '0'
 
     def set_itunes_episode_type(self, tag):
         """Parses the episode type and sets value"""
@@ -343,7 +343,7 @@ class Item(object):
         """Parses explicit from itunes item tags and sets value"""
         try:
             self.itunes_explicit = tag.string
-            if(self.itunes_explicit.lower() == 'no'):
+            if(self.itunes_explicit.lower() == 'no' or self.itunes_explicit.lower() == 'clean'):
                 self.itunes_explicit = False
             elif(self.itunes_explicit.lower() == 'yes'):
                 self.itunes_explicit = True

@@ -93,7 +93,7 @@ class TestBasicFeedItems(unittest.TestCase):
 
     def test_item_itunes_explicit(self):
         self.assertEqual(self.podcast.items[0].itunes_explicit, False)
-        self.assertEqual(self.podcast.items[1].itunes_explicit, "clean")
+        self.assertEqual(self.podcast.items[1].itunes_explicit, False)
 
     def test_item_itunes_order(self):
         self.assertEqual(self.podcast.items[0].itunes_order, "2")
@@ -474,7 +474,7 @@ class TestItunesEpisodes(unittest.TestCase):
         basic_podcast_file = open(basic_podcast_path, "rb")
         self.basic_podcast = basic_podcast_file.read()
         self.podcast = Podcast.Podcast(self.basic_podcast)
-# changing 
+# changing
 #    def test_episode_to_dict(self):
 #        ep_dict = self.podcast.items[0].to_dict()
 #        print(str(ep_dict))
@@ -530,5 +530,22 @@ class TestItunesEpisodesParsing(unittest.TestCase):
 
     def test_episode_parsing_meta_data_description(self):
         self.assertEqual(self.podcast.items[0].description,'test')
+
+    def test_episode_meta_data_episode_num(self):
+        self.assertEqual(self.podcast.items[1].itunes_episode, '0')
+
+    def test_episode_meta_data_episode_season(self):
+        self.assertEqual(self.podcast.items[1].itunes_season,'0')
+
+    def test_episode_meta_data_episode_num(self):
+        self.assertEqual(self.podcast.items[2].itunes_episode, '0')
+
+    def test_episode_meta_data_episode_season(self):
+        self.assertEqual(self.podcast.items[2].itunes_season,'0')
+
+    def test_episode_parsing_explicit(self):
+        self.assertEqual(self.podcast.items[1].itunes_explicit, False)
+
+
 if __name__ == '__main__':
     unittest.main()
