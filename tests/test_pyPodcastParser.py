@@ -546,6 +546,13 @@ class TestItunesEpisodesParsing(unittest.TestCase):
     def test_episode_parsing_explicit(self):
         self.assertEqual(self.podcast.items[1].itunes_explicit, False)
 
+    def test_episode_parsing_meta_data_pub_date(self):
+        self.assertEqual(self.podcast.items[1].published_date,'2022-12-15 05:00:52')
+# default to current day time
+#cant match on secs
+    #def test_episode_parsing_meta_data_pub_date(self):
+     #  self.assertEqual(self.podcast.items[2].published_date,'2022-12-15 05:00:52')
+
 
 if __name__ == '__main__':
     unittest.main()

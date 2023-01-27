@@ -210,6 +210,8 @@ class Item(object):
 
             deconstructed_date = self.published_date_string.split(" ")
 
+            if(len(deconstructed_date) < 4):
+                raise AttributeError
 
             if(re.match("^[a-zA-Z]{3}$",deconstructed_date[-1])):
                 deconstructed_date.pop()
@@ -218,8 +220,8 @@ class Item(object):
             new_array = []
 
 
-            for i,v in enumerate(deconstructed_date):
-                if(re.match(regex_array[i],v)):
+            for i,v in enumerate(regex_array):
+                if(re.match(deconstructed_date[i],v)):
                     new_array.append(v)
                 else:
                     for x,z in enumerate(deconstructed_date):
