@@ -205,8 +205,8 @@ class Item(object):
             self.guid = tag.string
         except AttributeError:
             self.guid = None
-            
-            
+
+
 #TODO convert to one timezone
     def set_published_date(self, tag):
         """Parses published date and set value."""
@@ -218,10 +218,13 @@ class Item(object):
             if(len(deconstructed_date) < 4):
                 raise AttributeError
 
-            published_date_timezone=None
+            published_date_timezone=""
             if (re.match("^[a-zA-Z]{3}$", deconstructed_date[-1])):
                 published_date_timezone= deconstructed_date[-1]
                 deconstructed_date.pop()
+            else:
+                published_date_timezone= 'EST'
+
 
             regex_array = ["^[a-zA-Z]{3},$","^\d{1,2}$","^[a-zA-Z]{3}$","^\d{4}$","^\d\d:\d\d"]
             new_array = []
@@ -236,7 +239,7 @@ class Item(object):
                             new_array.append(z)
                             break
             date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
-           
+
             if(len(new_array) != 5):
                 raise AttributeError
 
@@ -257,12 +260,12 @@ class Item(object):
                 now = datetime.datetime.now(timezone.utc)
                 published_date_timezone= "UTC"
                 self.published_date = now.strftime("%a, %d %b %Y %H:%M:%S")
-            
+
             if published_date_timezone in ['ET', 'EST', 'EDT']:
                 published_date_timezone= "US/Eastern"
-            current_timezone = pytz.timezone(published_date_timezone)
+            current_timezone = pytz.timezone(str(published_date_timezone))
             date_in_current_timezone = current_timezone.localize(self.published_date)
-            self.published_date = (date_in_current_timezone.astimezone(pytz.timezone('EST'))).replace(tzinfo=None)
+            self.published_date = str((date_in_current_timezone.astimezone(pytz.timezone('EST'))).replace(tzinfo=None))
             LOGGER.info('Final Published Date====={}'.format(self.published_date))
 
         except AttributeError as e:
@@ -361,12 +364,12 @@ class Item(object):
         """Parses explicit from itunes item tags and sets value"""
         try:
             self.itunes_explicit = tag.string
-            if(self.itunes_explicit.lower() == 'no' or self.itunes_explicit.lower() == 'clean'):
+            if(self.itunes_explicit.lower() == 'no' or self.itunes_explicit.lower() == 'false' or self.itunes_explicit.lower() == 'clean'):
                 self.itunes_explicit = False
-            elif(self.itunes_explicit.lower() == 'yes'):
+            elif(self.itunes_explicit.lower() == 'yes' or self.itunes_explicit.lower() == 'true' or  'offensive' in self.itunes_explicit.lower()):
                 self.itunes_explicit = True
             else:
-                self.itunes_explicit = self.itunes_explicit.lower()
+                self.itunes_explicit = None
 
         except AttributeError:
             self.itunes_explicit = None
