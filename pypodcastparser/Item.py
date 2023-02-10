@@ -5,7 +5,11 @@ from datetime import timezone
 import email.utils
 from dateutil.parser import parse
 import re
-import time
+import pytz
+import logging
+LOGGER = logging.getLogger(__name__)
+
+
 class Item(object):
     """Parses an xml rss feed
 
@@ -201,6 +205,8 @@ class Item(object):
             self.guid = tag.string
         except AttributeError:
             self.guid = None
+            
+            
 #TODO convert to one timezone
     def set_published_date(self, tag):
         """Parses published date and set value."""
@@ -209,11 +215,12 @@ class Item(object):
             self.published_date_string = tag.string
 
             deconstructed_date = self.published_date_string.split(" ")
-
             if(len(deconstructed_date) < 4):
                 raise AttributeError
 
-            if(re.match("^[a-zA-Z]{3}$",deconstructed_date[-1])):
+            published_date_timezone=None
+            if (re.match("^[a-zA-Z]{3}$", deconstructed_date[-1])):
+                published_date_timezone= deconstructed_date[-1]
                 deconstructed_date.pop()
 
             regex_array = ["^[a-zA-Z]{3},$","^\d{1,2}$","^[a-zA-Z]{3}$","^\d{4}$","^\d\d:\d\d"]
@@ -229,31 +236,40 @@ class Item(object):
                             new_array.append(z)
                             break
             date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
-
-
+           
             if(len(new_array) != 5):
                 raise AttributeError
 
             time = date_string.split(":")
-            if(len(time) == 2):
+            if (len(time) == 2):
                 minutes = time[1].split(" ")
                 minutes[0]+=":00"
                 time[0] += ":"+minutes[0]
-                self.published_date = str(datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S"))
-            elif(len(time) == 3):
+                self.published_date = datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S")
+
+            elif (len(time) == 3):
                 time[0] += ":"+time[1]
                 seconds = time[2]
                 seconds_string = seconds[:2]
                 time[0] += ":"+seconds_string
-                self.published_date = str(datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S"))
+                self.published_date = datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S")
             else:
                 now = datetime.datetime.now(timezone.utc)
-                date = now.strftime("%a, %d %b %Y %H:%M:%S")
-                self.published_date = date
-        except AttributeError:
-            now = datetime.datetime.now(timezone.utc)
-            date = now.strftime("%a, %d %b %Y %H:%M:%S")
-            self.published_date = date
+                published_date_timezone= "UTC"
+                self.published_date = now.strftime("%a, %d %b %Y %H:%M:%S")
+            
+            if published_date_timezone in ['ET', 'EST', 'EDT']:
+                published_date_timezone= "US/Eastern"
+            current_timezone = pytz.timezone(published_date_timezone)
+            date_in_current_timezone = current_timezone.localize(self.published_date)
+            self.published_date = (date_in_current_timezone.astimezone(pytz.timezone('EST'))).replace(tzinfo=None)
+            LOGGER.info('Final Published Date====={}'.format(self.published_date))
+
+        except AttributeError as e:
+            # LOGGER.error('AttributeError: {}'.format(str(e)))
+            now = datetime.datetime.now(pytz.timezone('EST'))
+            self.published_date = now.strftime("%Y-%m-%d %H:%M:%S")
+
 
     def set_title(self, tag):
         """Parses title and set value."""

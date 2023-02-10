@@ -4,3 +4,4 @@ lxml
 pluggy
 requests
 wheel
+pytz==2022.7.1
