@@ -230,13 +230,13 @@ class Item(object):
             new_array = []
 
 
-            for i,v in enumerate(regex_array):
-                if(re.match(deconstructed_date[i],v)):
+            for index,value in enumerate(regex_array):
+                if(re.match(deconstructed_date[index],value)):
                     new_array.append(v)
                 else:
-                    for x,z in enumerate(deconstructed_date):
-                        if(re.match(regex_array[i],z)):
-                            new_array.append(z)
+                    for inner_index,inner_value in enumerate(deconstructed_date):
+                        if(re.match(regex_array[inner_index],inner_value)):
+                            new_array.append(inner_value)
                             break
             date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
 
@@ -263,7 +263,7 @@ class Item(object):
 
             if published_date_timezone in ['ET', 'EST', 'EDT']:
                 published_date_timezone= "US/Eastern"
-            current_timezone = pytz.timezone(str(published_date_timezone))
+            current_timezone = pytz.timezone(published_date_timezone)
             date_in_current_timezone = current_timezone.localize(self.published_date)
             self.published_date = str((date_in_current_timezone.astimezone(pytz.timezone('EST'))).replace(tzinfo=None))
             LOGGER.info('Final Published Date====={}'.format(self.published_date))
