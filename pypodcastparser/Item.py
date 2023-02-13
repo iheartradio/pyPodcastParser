@@ -228,14 +228,12 @@ class Item(object):
 
             regex_array = ["^[a-zA-Z]{3},$","^\d{1,2}$","^[a-zA-Z]{3}$","^\d{4}$","^\d\d:\d\d"]
             new_array = []
-
-
-            for index,value in enumerate(regex_array):
-                if(re.match(deconstructed_date[index],value)):
-                    new_array.append(v)
+            for array_index, array_value in enumerate(regex_array):
+                if(re.match(deconstructed_date[array_index],array_value)):
+                    new_array.append(array_value)
                 else:
                     for inner_index,inner_value in enumerate(deconstructed_date):
-                        if(re.match(regex_array[inner_index],inner_value)):
+                        if(re.match(regex_array[array_index],inner_value)):
                             new_array.append(inner_value)
                             break
             date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
@@ -259,17 +257,17 @@ class Item(object):
             else:
                 now = datetime.datetime.now(timezone.utc)
                 published_date_timezone= "UTC"
-                self.published_date = now.strftime("%a, %d %b %Y %H:%M:%S")
+                self.published_date = datetime.datetime.strptime(now, "%a, %d %b %Y %H:%M:%S") 
 
-            if published_date_timezone in ['ET', 'EST', 'EDT']:
-                published_date_timezone= "US/Eastern"
-            current_timezone = pytz.timezone(published_date_timezone)
-            date_in_current_timezone = current_timezone.localize(self.published_date)
-            self.published_date = str((date_in_current_timezone.astimezone(pytz.timezone('EST'))).replace(tzinfo=None))
-            LOGGER.info('Final Published Date====={}'.format(self.published_date))
+            if published_date_timezone not in ['ET', 'EST', 'EDT']:
+                current_timezone = pytz.timezone(published_date_timezone)
+                date_in_current_timezone = current_timezone.localize(self.published_date)
+                self.published_date = str((date_in_current_timezone.astimezone(pytz.timezone('US/Eastern'))).replace(tzinfo=None))
+                LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
+            else:
+                LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
 
         except AttributeError as e:
-            # LOGGER.error('AttributeError: {}'.format(str(e)))
             now = datetime.datetime.now(pytz.timezone('EST'))
             self.published_date = now.strftime("%Y-%m-%d %H:%M:%S")
 
