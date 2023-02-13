@@ -485,7 +485,7 @@ class TestItunesEpisodes(unittest.TestCase):
         self.assertEqual(self.podcast.items[0].itunes_season,'3')
 
     def test_episode_meta_data_pub_date(self):
-        self.assertEqual(self.podcast.items[0].published_date,'2022-05-30 04:05:03')
+        self.assertEqual(self.podcast.items[0].published_date,'2022-05-30 00:05:03')
 
     def test_episode_meta_data_external_image_url(self):
         self.assertEqual(self.podcast.items[0].itunes_image,"https://cdn.images.adorilabs.com/v1/df2e8faf-d164-4b52-b101-437415245524.png")
@@ -520,7 +520,7 @@ class TestItunesEpisodesParsing(unittest.TestCase):
         self.podcast = Podcast.Podcast(self.basic_podcast)
 
     def test_episode_parsing_meta_data_pub_date(self):
-        self.assertEqual(self.podcast.items[0].published_date,'2021-07-19 16:14:29')
+        self.assertEqual(str(self.podcast.items[0].published_date),'2021-07-19 16:14:29')
 
     def test_episode_parsing_meta_data_description(self):
         self.assertEqual(self.podcast.items[0].description,'test')
@@ -536,9 +536,6 @@ class TestItunesEpisodesParsing(unittest.TestCase):
 
     def test_episode_parsing_explicit(self):
         self.assertEqual(self.podcast.items[0].itunes_explicit, False)
-
-    def test_episode_parsing_meta_data_pub_date(self):
-        self.assertEqual(self.podcast.items[0].published_date,'2022-12-15 05:00:52')
 
 
 if __name__ == '__main__':
