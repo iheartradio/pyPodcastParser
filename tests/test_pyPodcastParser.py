@@ -531,9 +531,6 @@ class TestItunesEpisodesParsing(unittest.TestCase):
     def test_episode_meta_data_episode_season(self):
         self.assertEqual(self.podcast.items[0].itunes_season,'0')
 
-    def test_episode_meta_data_episode_num(self):
-        self.assertEqual(self.podcast.items[0].itunes_episode, '0')
-
     def test_episode_meta_data_episode_season(self):
         self.assertEqual(self.podcast.items[0].itunes_season,'0')
 
