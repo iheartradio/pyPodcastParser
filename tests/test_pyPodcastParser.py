@@ -2,7 +2,7 @@
 import datetime
 import os
 import unittest
-
+import pytz
 from pypodcastparser import Podcast
 
 # py.test test_pypodcastparser.py
@@ -486,6 +486,12 @@ class TestItunesEpisodes(unittest.TestCase):
 
     def test_episode_meta_data_pub_date(self):
         self.assertEqual(self.podcast.items[0].published_date,'2022-05-30 00:05:03')
+        self.assertEqual(self.podcast.items[1].published_date,'2022-05-30 07:05:03')
+        self.assertEqual(self.podcast.items[2].published_date,'2022-05-30 00:05:03')
+        current_time= datetime.datetime.now(pytz.timezone('US/Eastern')).strftime("%Y-%m-%d %H:%M")
+        self.assertEqual(self.podcast.items[3].published_date, current_time)
+
+
 
     def test_episode_meta_data_external_image_url(self):
         self.assertEqual(self.podcast.items[0].itunes_image,"https://cdn.images.adorilabs.com/v1/df2e8faf-d164-4b52-b101-437415245524.png")

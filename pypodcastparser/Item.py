@@ -292,8 +292,7 @@ class Item(object):
                 LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
 
         except Exception as e:
-            now = datetime.datetime.now(pytz.timezone('US/Eastern'))
-            self.published_date = datetime.datetime.strptime(now, "%Y-%m-%d %H:%M:%S")
+            self.published_date = datetime.datetime.now(pytz.timezone('US/Eastern')).strftime("%Y-%m-%d %H:%M")
 
 
     def set_title(self, tag):
