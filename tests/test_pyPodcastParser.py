@@ -495,18 +495,23 @@ class TestItunesEpisodes(unittest.TestCase):
 
     def test_episode_meta_data_is_interactive(self):
         self.assertEqual(self.podcast.items[0].is_interactive,True)
+        self.assertEqual(self.podcast.items[1].is_interactive,True)
 
     def test_episode_meta_data_interactive(self):
         self.assertEqual(self.podcast.items[0].interactive,True)
+        self.assertEqual(self.podcast.items[1].interactive,True)
 
     def test_episode_meta_data_interactive(self):
         self.assertEqual(self.podcast.items[0].itunes_duration,'2785')
+        self.assertEqual(self.podcast.items[1].itunes_duration,'2785')
 
     def test_episode_meta_data_content_encoded(self):
         self.assertEqual(self.podcast.items[0].content_encoded,'test')
+        self.assertEqual(self.podcast.items[1].content_encoded,'test')
 
     def test_episode_meta_data_description(self):
         self.assertEqual(self.podcast.items[0].description,'description')
+        self.assertEqual(self.podcast.items[1].description,'description')
 
 
 class TestItunesEpisodesParsing(unittest.TestCase):
@@ -527,9 +532,6 @@ class TestItunesEpisodesParsing(unittest.TestCase):
 
     def test_episode_meta_data_episode_num(self):
         self.assertEqual(self.podcast.items[0].itunes_episode, '0')
-
-    def test_episode_meta_data_episode_season(self):
-        self.assertEqual(self.podcast.items[0].itunes_season,'0')
 
     def test_episode_meta_data_episode_season(self):
         self.assertEqual(self.podcast.items[0].itunes_season,'0')

@@ -10,6 +10,26 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
+pytz_timezon_list= [tz for tz in pytz.all_timezones]
+common_timezones= {'GMT' : "GMT",
+'UTC' : 'UTC' ,
+'CET' : 'Europe/Berlin',
+'EET' : 'Africa/Cairo' ,
+'EAT' : 'Africa/Addis_Ababa' ,
+'IST' : 'Asia/Kolkata' ,
+'BST' : 'Europe/London' ,
+'JST' : 'Asia/Tokyo' ,
+'ACT' : 'Australia/ACT' ,
+'SST' : 'Pacific/Pago_Pago' ,
+'NST' : 'America/St_Johns' ,
+'HST' : 'America/Adak' ,
+'AST' : 'America/Puerto_Rico' ,
+'PST' : 'US/Pacific' ,
+'CST' : 'US/Central' ,	
+'CAT' : 'Africa/Maputo' ,	
+    }
+    
+
 class Item(object):
     """Parses an xml rss feed
 
@@ -260,16 +280,20 @@ class Item(object):
                 self.published_date = datetime.datetime.strptime(now, "%a, %d %b %Y %H:%M:%S") 
 
             if published_date_timezone not in ['ET', 'EST', 'EDT']:
-                current_timezone = pytz.timezone(published_date_timezone)
+                if published_date_timezone in pytz_timezon_list:
+                    current_timezone = pytz.timezone(published_date_timezone)
+                else:
+                    current_timezone = pytz.timezone(common_timezones.get(published_date_timezone))
+
                 date_in_current_timezone = current_timezone.localize(self.published_date)
                 self.published_date = str((date_in_current_timezone.astimezone(pytz.timezone('US/Eastern'))).replace(tzinfo=None))
                 LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
             else:
                 LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
 
-        except AttributeError as e:
-            now = datetime.datetime.now(pytz.timezone('EST'))
-            self.published_date = now.strftime("%Y-%m-%d %H:%M:%S")
+        except Exception as e:
+            now = datetime.datetime.now(pytz.timezone('US/Eastern'))
+            self.published_date = datetime.datetime.strptime(now, "%Y-%m-%d %H:%M:%S")
 
 
     def set_title(self, tag):
