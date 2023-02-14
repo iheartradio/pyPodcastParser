@@ -2,7 +2,7 @@
 import datetime
 import os
 import unittest
-
+import pytz
 from pypodcastparser import Podcast
 
 # py.test test_pypodcastparser.py
@@ -55,7 +55,7 @@ class TestBasicFeedItemBlocked(unittest.TestCase):
 
     def test_item_itunes_explicit(self):
         self.assertEqual(self.podcast.items[0].itunes_explicit, True)
-        self.assertEqual(self.podcast.items[1].itunes_explicit, "highly offensive")
+        self.assertEqual(self.podcast.items[1].itunes_explicit, True)
 
 
 class TestBasicFeedItems(unittest.TestCase):
@@ -474,12 +474,6 @@ class TestItunesEpisodes(unittest.TestCase):
         basic_podcast_file = open(basic_podcast_path, "rb")
         self.basic_podcast = basic_podcast_file.read()
         self.podcast = Podcast.Podcast(self.basic_podcast)
-# changing
-#    def test_episode_to_dict(self):
-#        ep_dict = self.podcast.items[0].to_dict()
-#        print(str(ep_dict))
-#        self.assertEqual(str(ep_dict),"{'external_id': 'adori-8d2abc8f-65a4-401f-a6ef-45d86a24e0be', 'episode_duration': '2785', 'is_explicit': 'false', 'episode_number': '111', 'episode_season': '3', 'episode_type': 'full', 'external_image_url': 'https://cdn.images.adorilabs.com/v1/df2e8faf-d164-4b52-b101-437415245524.png', 'episode_subtitle': 'News & Headlines, Early June 2022', 'episode_description': 'test', 'original_air_date': '2022-05-30 04:05:03', 'start_date': '2022-05-30 04:05:03', 'episode_title': 'CORVETTE TODAY #111 - Corvette News & Headlines, Early June 2020', 'interactive': True, 'external_url': 'https://static.adorilabs.com/audiotracks/episode--ep_esWWrdyNUgFEakL0TmTuLX9e0xjg0eBHx/v1/17773-ID6aGhYYXWHO7v5v-9b049e80-b77c-4069-8121-4b2fcc2a8b45-12017.mp3'}")
-
 
     def test_episode_meta_data_episode_type(self):
         self.assertEqual(self.podcast.items[0].itunes_episode_type, "full")
@@ -491,7 +485,13 @@ class TestItunesEpisodes(unittest.TestCase):
         self.assertEqual(self.podcast.items[0].itunes_season,'3')
 
     def test_episode_meta_data_pub_date(self):
-        self.assertEqual(self.podcast.items[0].published_date,'2022-05-30 04:05:03')
+        self.assertEqual(self.podcast.items[0].published_date,'2022-05-30 00:05:03')
+        self.assertEqual(self.podcast.items[1].published_date,'2022-05-30 07:05:03')
+        self.assertEqual(self.podcast.items[2].published_date,'2022-05-30 00:05:03')
+        current_time= datetime.datetime.now(pytz.timezone('US/Eastern')).strftime("%Y-%m-%d %H:%M")
+        self.assertEqual(self.podcast.items[3].published_date, current_time)
+
+
 
     def test_episode_meta_data_external_image_url(self):
         self.assertEqual(self.podcast.items[0].itunes_image,"https://cdn.images.adorilabs.com/v1/df2e8faf-d164-4b52-b101-437415245524.png")
@@ -501,18 +501,23 @@ class TestItunesEpisodes(unittest.TestCase):
 
     def test_episode_meta_data_is_interactive(self):
         self.assertEqual(self.podcast.items[0].is_interactive,True)
+        self.assertEqual(self.podcast.items[1].is_interactive,True)
 
     def test_episode_meta_data_interactive(self):
         self.assertEqual(self.podcast.items[0].interactive,True)
+        self.assertEqual(self.podcast.items[1].interactive,True)
 
     def test_episode_meta_data_interactive(self):
         self.assertEqual(self.podcast.items[0].itunes_duration,'2785')
+        self.assertEqual(self.podcast.items[1].itunes_duration,'2785')
 
     def test_episode_meta_data_content_encoded(self):
         self.assertEqual(self.podcast.items[0].content_encoded,'test')
+        self.assertEqual(self.podcast.items[1].content_encoded,'test')
 
     def test_episode_meta_data_description(self):
         self.assertEqual(self.podcast.items[0].description,'description')
+        self.assertEqual(self.podcast.items[1].description,'description')
 
 
 class TestItunesEpisodesParsing(unittest.TestCase):
@@ -526,32 +531,19 @@ class TestItunesEpisodesParsing(unittest.TestCase):
         self.podcast = Podcast.Podcast(self.basic_podcast)
 
     def test_episode_parsing_meta_data_pub_date(self):
-        self.assertEqual(self.podcast.items[0].published_date,'2022-12-15 05:00:52')
+        self.assertEqual(str(self.podcast.items[0].published_date),'2021-07-19 16:14:29')
 
     def test_episode_parsing_meta_data_description(self):
         self.assertEqual(self.podcast.items[0].description,'test')
 
     def test_episode_meta_data_episode_num(self):
-        self.assertEqual(self.podcast.items[1].itunes_episode, '0')
+        self.assertEqual(self.podcast.items[0].itunes_episode, '0')
 
     def test_episode_meta_data_episode_season(self):
-        self.assertEqual(self.podcast.items[1].itunes_season,'0')
-
-    def test_episode_meta_data_episode_num(self):
-        self.assertEqual(self.podcast.items[2].itunes_episode, '0')
-
-    def test_episode_meta_data_episode_season(self):
-        self.assertEqual(self.podcast.items[2].itunes_season,'0')
+        self.assertEqual(self.podcast.items[0].itunes_season,'0')
 
     def test_episode_parsing_explicit(self):
-        self.assertEqual(self.podcast.items[1].itunes_explicit, False)
-
-    def test_episode_parsing_meta_data_pub_date(self):
-        self.assertEqual(self.podcast.items[1].published_date,'2022-12-15 05:00:52')
-# default to current day time
-#cant match on secs
-    #def test_episode_parsing_meta_data_pub_date(self):
-     #  self.assertEqual(self.podcast.items[2].published_date,'2022-12-15 05:00:52')
+        self.assertEqual(self.podcast.items[0].itunes_explicit, False)
 
 
 if __name__ == '__main__':

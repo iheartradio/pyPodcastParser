@@ -5,7 +5,31 @@ from datetime import timezone
 import email.utils
 from dateutil.parser import parse
 import re
-import time
+import pytz
+import logging
+LOGGER = logging.getLogger(__name__)
+
+
+pytz_timezon_list= [tz for tz in pytz.all_timezones]
+common_timezones= {'GMT' : "GMT",
+'UTC' : 'UTC' ,
+'CET' : 'Europe/Berlin',
+'EET' : 'Africa/Cairo' ,
+'EAT' : 'Africa/Addis_Ababa' ,
+'IST' : 'Asia/Kolkata' ,
+'BST' : 'Europe/London' ,
+'JST' : 'Asia/Tokyo' ,
+'ACT' : 'Australia/ACT' ,
+'SST' : 'Pacific/Pago_Pago' ,
+'NST' : 'America/St_Johns' ,
+'HST' : 'America/Adak' ,
+'AST' : 'America/Puerto_Rico' ,
+'PST' : 'US/Pacific' ,
+'CST' : 'US/Central' ,	
+'CAT' : 'Africa/Maputo' ,	
+    }
+    
+
 class Item(object):
     """Parses an xml rss feed
 
@@ -201,6 +225,8 @@ class Item(object):
             self.guid = tag.string
         except AttributeError:
             self.guid = None
+
+
 #TODO convert to one timezone
     def set_published_date(self, tag):
         """Parses published date and set value."""
@@ -209,51 +235,65 @@ class Item(object):
             self.published_date_string = tag.string
 
             deconstructed_date = self.published_date_string.split(" ")
-
             if(len(deconstructed_date) < 4):
                 raise AttributeError
 
-            if(re.match("^[a-zA-Z]{3}$",deconstructed_date[-1])):
+            published_date_timezone=""
+            if (re.match("^[a-zA-Z]{3}$", deconstructed_date[-1])):
+                published_date_timezone= deconstructed_date[-1]
                 deconstructed_date.pop()
+            else:
+                published_date_timezone= 'EST'
+
 
             regex_array = ["^[a-zA-Z]{3},$","^\d{1,2}$","^[a-zA-Z]{3}$","^\d{4}$","^\d\d:\d\d"]
             new_array = []
-
-
-            for i,v in enumerate(regex_array):
-                if(re.match(deconstructed_date[i],v)):
-                    new_array.append(v)
+            for array_index, array_value in enumerate(regex_array):
+                if(re.match(deconstructed_date[array_index],array_value)):
+                    new_array.append(array_value)
                 else:
-                    for x,z in enumerate(deconstructed_date):
-                        if(re.match(regex_array[i],z)):
-                            new_array.append(z)
+                    for inner_index,inner_value in enumerate(deconstructed_date):
+                        if(re.match(regex_array[array_index],inner_value)):
+                            new_array.append(inner_value)
                             break
             date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
-
 
             if(len(new_array) != 5):
                 raise AttributeError
 
             time = date_string.split(":")
-            if(len(time) == 2):
+            if (len(time) == 2):
                 minutes = time[1].split(" ")
                 minutes[0]+=":00"
                 time[0] += ":"+minutes[0]
-                self.published_date = str(datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S"))
-            elif(len(time) == 3):
+                self.published_date = datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S")
+
+            elif (len(time) == 3):
                 time[0] += ":"+time[1]
                 seconds = time[2]
                 seconds_string = seconds[:2]
                 time[0] += ":"+seconds_string
-                self.published_date = str(datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S"))
+                self.published_date = datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S")
             else:
                 now = datetime.datetime.now(timezone.utc)
-                date = now.strftime("%a, %d %b %Y %H:%M:%S")
-                self.published_date = date
-        except AttributeError:
-            now = datetime.datetime.now(timezone.utc)
-            date = now.strftime("%a, %d %b %Y %H:%M:%S")
-            self.published_date = date
+                published_date_timezone= "UTC"
+                self.published_date = datetime.datetime.strptime(now, "%a, %d %b %Y %H:%M:%S") 
+
+            if published_date_timezone not in ['ET', 'EST', 'EDT']:
+                if published_date_timezone in pytz_timezon_list:
+                    current_timezone = pytz.timezone(published_date_timezone)
+                else:
+                    current_timezone = pytz.timezone(common_timezones.get(published_date_timezone))
+
+                date_in_current_timezone = current_timezone.localize(self.published_date)
+                self.published_date = str((date_in_current_timezone.astimezone(pytz.timezone('US/Eastern'))).replace(tzinfo=None))
+                LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
+            else:
+                LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
+
+        except Exception as e:
+            self.published_date = datetime.datetime.now(pytz.timezone('US/Eastern')).strftime("%Y-%m-%d %H:%M")
+
 
     def set_title(self, tag):
         """Parses title and set value."""
@@ -345,12 +385,12 @@ class Item(object):
         """Parses explicit from itunes item tags and sets value"""
         try:
             self.itunes_explicit = tag.string
-            if(self.itunes_explicit.lower() == 'no' or self.itunes_explicit.lower() == 'clean'):
+            if(self.itunes_explicit.lower() == 'no' or self.itunes_explicit.lower() == 'false' or self.itunes_explicit.lower() == 'clean'):
                 self.itunes_explicit = False
-            elif(self.itunes_explicit.lower() == 'yes'):
+            elif(self.itunes_explicit.lower() == 'yes' or self.itunes_explicit.lower() == 'true' or  'offensive' in self.itunes_explicit.lower()):
                 self.itunes_explicit = True
             else:
-                self.itunes_explicit = self.itunes_explicit.lower()
+                self.itunes_explicit = None
 
         except AttributeError:
             self.itunes_explicit = None
