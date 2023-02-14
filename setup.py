@@ -11,7 +11,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='pypodcastparser-ihr',
 
-    version='1.4.2-dev',
+    version='1.4.3-dev',
 
     description='pypodcastparser is a podcast parser.',
     long_description=long_description,
