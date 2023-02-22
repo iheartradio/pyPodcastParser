@@ -25,10 +25,10 @@ common_timezones= {'GMT' : "GMT",
 'HST' : 'America/Adak' ,
 'AST' : 'America/Puerto_Rico' ,
 'PST' : 'US/Pacific' ,
-'CST' : 'US/Central' ,	
-'CAT' : 'Africa/Maputo' ,	
+'CST' : 'US/Central' ,
+'CAT' : 'Africa/Maputo' ,
     }
-    
+
 
 class Item(object):
     """Parses an xml rss feed
@@ -259,7 +259,7 @@ class Item(object):
             date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
 
             if(len(new_array) != 5):
-                raise AttributeError
+                raise AttributeError("Error new array is not of length 5 for formatting")
 
             time = date_string.split(":")
             if (len(time) == 2):
@@ -277,7 +277,7 @@ class Item(object):
             else:
                 now = datetime.datetime.now(timezone.utc)
                 published_date_timezone= "UTC"
-                self.published_date = datetime.datetime.strptime(now, "%a, %d %b %Y %H:%M:%S") 
+                self.published_date = datetime.datetime.strptime(now, "%a, %d %b %Y %H:%M:%S")
 
             if published_date_timezone not in ['ET', 'EST', 'EDT']:
                 if published_date_timezone in pytz_timezon_list:
