@@ -259,7 +259,7 @@ class Item(object):
             date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
 
             if(len(new_array) != 5):
-                raise AttributeError("Error new array is not of length 5 for formatting")
+                raise AttributeError("Error creating new date array. Array is not of length 5 for formatting")
 
             time = date_string.split(":")
             if (len(time) == 2):
