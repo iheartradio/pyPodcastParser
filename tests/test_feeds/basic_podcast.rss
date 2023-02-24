@@ -47,7 +47,7 @@
         </itunes:owner>
         <itunes:subtitle>basic itunes subtitle</itunes:subtitle>
         <itunes:summary>basic itunes summary</itunes:summary>
-        <itunes:type>FULL</itunes:type> 
+        <itunes:type>FULL</itunes:type>
         <item>
 
             <author>lawyer@boyer.net</author>
@@ -55,7 +55,7 @@
             <category>Stones</category>
             <comments>http://comments.com/entry/0</comments>
             <creativeCommons:license>http://www.creativecommons.org/licenses/by-nc/1.0</creativeCommons:license>
-            <description>basic item description</description>
+            <description><p><em>basic item description</p></em></description>
             <guid isPermaLink="true">basic item guid</guid>
             <link>http://google.com/0</link>
             <pubDate>Fri, 21 Mar 2008 09:51:00 EDT</pubDate>

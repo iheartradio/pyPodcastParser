@@ -1,8 +1,33 @@
 from bs4 import Tag
 
 import datetime
+from datetime import timezone
 import email.utils
 from dateutil.parser import parse
+import re
+import pytz
+import logging
+LOGGER = logging.getLogger(__name__)
+
+
+pytz_timezon_list= [tz for tz in pytz.all_timezones]
+common_timezones= {'GMT' : "GMT",
+'UTC' : 'UTC' ,
+'CET' : 'Europe/Berlin',
+'EET' : 'Africa/Cairo' ,
+'EAT' : 'Africa/Addis_Ababa' ,
+'IST' : 'Asia/Kolkata' ,
+'BST' : 'Europe/London' ,
+'JST' : 'Asia/Tokyo' ,
+'ACT' : 'Australia/ACT' ,
+'SST' : 'Pacific/Pago_Pago' ,
+'NST' : 'America/St_Johns' ,
+'HST' : 'America/Adak' ,
+'AST' : 'America/Puerto_Rico' ,
+'PST' : 'US/Pacific' ,
+'CST' : 'US/Central' ,
+'CAT' : 'Africa/Maputo' ,
+    }
 
 
 class Item(object):
@@ -133,28 +158,22 @@ class Item(object):
 
     def to_dict(self):
         item = {}
-        item['author'] = self.author
-        item['enclosure_url'] = self.enclosure_url
-        item['enclosure_type'] = self.enclosure_type
-        item['enclosure_length'] = self.enclosure_length
-        item['enclosure_type'] = self.enclosure_type
-        item['guid'] = self.guid
-        item['itunes_author_name'] = self.itunes_author_name
-        item['itunes_block'] = self.itunes_block
-        item['itunes_duration'] = self.itunes_duration
-        item['itunes_explicit'] = self.itunes_explicit
-        item['itunes_episode'] = self.itunes_episode
-        item['itunes_season'] = self.itunes_season
-        item['itunes_episode_type'] = self.itunes_episode_type
-        item['itunes_image'] = self.itunes_image
-        item['itunes_order'] = self.itunes_order
-        item['itunes_subtitle'] = self.itunes_subtitle
-        item['itunes_summary'] = self.itunes_summary
-        item['content_encoded'] = self.content_encoded
-        item['description'] = self.description
-        item['published_date'] = self.published_date
-        item['title'] = self.title
+        item['external_id'] = self.guid
+        item['episode_duration'] = self.itunes_duration
+        item['is_explicit'] = self.itunes_explicit
+        item['episode_number'] = self.itunes_episode
+        item['episode_season'] = self.itunes_season
+        item['episode_type'] = self.itunes_episode_type
+        item['external_image_url'] = self.itunes_image
+        item['episode_subtitle'] = self.itunes_subtitle
+        item['episode_description'] = self.description
+        item['original_air_date'] = self.published_date
+        item['start_date'] = self.published_date
+        item['episode_title'] = self.title
         item['interactive'] = self.interactive
+        item['external_url'] = self.enclosure_url
+
+
         return item
 
     def set_rss_element(self):
@@ -171,10 +190,7 @@ class Item(object):
     def set_description(self, tag):
         """Parses description and set value."""
         try:
-            if (self.content_encoded is not None):
-                self.description = self.content_encoded
-            else:
-                self.description = tag.string
+            self.description = tag.string
         except AttributeError:
             self.description = None
 
@@ -182,6 +198,8 @@ class Item(object):
         """Parses content_encoded and set value."""
         try:
             self.content_encoded = tag.string
+            if(self.description == None):
+                self.description = self.content_encoded
         except AttributeError:
             self.content_encoded = None
 
@@ -208,15 +226,74 @@ class Item(object):
         except AttributeError:
             self.guid = None
 
+
+#TODO convert to one timezone
     def set_published_date(self, tag):
         """Parses published date and set value."""
         try:
             self.published_date = tag.string
             self.published_date_string = tag.string
-            pubdate = parse(self.published_date)
-            self.published_date = datetime.datetime.strftime(pubdate, "%Y-%d-%m, %H:%M:%S")
-        except AttributeError:
-            self.published_date = None
+
+            deconstructed_date = self.published_date_string.split(" ")
+            if(len(deconstructed_date) < 4):
+                raise AttributeError
+
+            published_date_timezone=""
+            if (re.match("^[a-zA-Z]{3}$", deconstructed_date[-1])):
+                published_date_timezone= deconstructed_date[-1]
+                deconstructed_date.pop()
+            else:
+                published_date_timezone= 'EST'
+
+
+            regex_array = ["^[a-zA-Z]{3},$","^\d{1,2}$","^[a-zA-Z]{3}$","^\d{4}$","^\d\d:\d\d"]
+            new_array = []
+            for array_index, array_value in enumerate(regex_array):
+                if(re.match(deconstructed_date[array_index],array_value)):
+                    new_array.append(array_value)
+                else:
+                    for inner_index,inner_value in enumerate(deconstructed_date):
+                        if(re.match(regex_array[array_index],inner_value)):
+                            new_array.append(inner_value)
+                            break
+            date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
+
+            if(len(new_array) != 5):
+                raise AttributeError("Error creating new date array. Array is not of length 5 for formatting")
+
+            time = date_string.split(":")
+            if (len(time) == 2):
+                minutes = time[1].split(" ")
+                minutes[0]+=":00"
+                time[0] += ":"+minutes[0]
+                self.published_date = datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S")
+
+            elif (len(time) == 3):
+                time[0] += ":"+time[1]
+                seconds = time[2]
+                seconds_string = seconds[:2]
+                time[0] += ":"+seconds_string
+                self.published_date = datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S")
+            else:
+                now = datetime.datetime.now(timezone.utc)
+                published_date_timezone= "UTC"
+                self.published_date = datetime.datetime.strptime(now, "%a, %d %b %Y %H:%M:%S")
+
+            if published_date_timezone not in ['ET', 'EST', 'EDT']:
+                if published_date_timezone in pytz_timezon_list:
+                    current_timezone = pytz.timezone(published_date_timezone)
+                else:
+                    current_timezone = pytz.timezone(common_timezones.get(published_date_timezone))
+
+                date_in_current_timezone = current_timezone.localize(self.published_date)
+                self.published_date = str((date_in_current_timezone.astimezone(pytz.timezone('US/Eastern'))).replace(tzinfo=None))
+                LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
+            else:
+                LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
+
+        except Exception as e:
+            self.published_date = datetime.datetime.now(pytz.timezone('US/Eastern')).strftime("%Y-%m-%d %H:%M")
+
 
     def set_title(self, tag):
         """Parses title and set value."""
@@ -236,15 +313,20 @@ class Item(object):
         """Parses the episode number and sets value"""
         try:
             self.itunes_episode = tag.string
+
+            if self.itunes_episode == "" or self.itunes_episode == None:
+                self.itunes_episode = '0'
         except AttributeError:
-            self.itunes_episode = None
+            self.itunes_episode = '0'
 
     def set_itunes_season(self, tag):
         """Parses the episode season and sets value"""
         try:
             self.itunes_season = tag.string
+            if self.itunes_season == "" or self.itunes_season == None:
+                self.itunes_season = '0'
         except AttributeError:
-            self.itunes_season = None
+            self.itunes_season = '0'
 
     def set_itunes_episode_type(self, tag):
         """Parses the episode type and sets value"""
@@ -268,7 +350,34 @@ class Item(object):
     def set_itunes_duration(self, tag):
         """Parses duration from itunes tags and sets value"""
         try:
-            self.itunes_duration = tag.string
+            #remove milli seconds
+            time_no_mil = tag.string.split('.')
+            t = time_no_mil[0].split(':')
+            duration = 0
+            if(len(t) == 3):
+                for i,v in enumerate(t):
+                    if(i  == 0):
+                        duration += int(t[0]) * 3600
+                    elif(i  == 1):
+                        duration += int(t[1]) * 60
+                    else:
+                        duration += int(t[2])
+                self.itunes_duration = duration
+
+            elif(len(t) == 2):
+                for i,v in enumerate(t):
+                    if(i  == 0):
+                        duration += int(t[0]) * 60
+                    else:
+                        duration += int(t[1])
+
+                self.itunes_duration = duration
+            else:
+                self.itunes_duration = tag.string
+
+
+
+
         except AttributeError:
             self.itunes_duration = None
 
@@ -276,7 +385,13 @@ class Item(object):
         """Parses explicit from itunes item tags and sets value"""
         try:
             self.itunes_explicit = tag.string
-            self.itunes_explicit = self.itunes_explicit.lower()
+            if(self.itunes_explicit.lower() == 'no' or self.itunes_explicit.lower() == 'false' or self.itunes_explicit.lower() == 'clean'):
+                self.itunes_explicit = False
+            elif(self.itunes_explicit.lower() == 'yes' or self.itunes_explicit.lower() == 'true' or  'offensive' in self.itunes_explicit.lower()):
+                self.itunes_explicit = True
+            else:
+                self.itunes_explicit = None
+
         except AttributeError:
             self.itunes_explicit = None
 

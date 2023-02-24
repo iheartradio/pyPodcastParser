@@ -357,8 +357,13 @@ class Podcast:
         try:
             self.published_date = tag.string
             self.published_date_string = tag.string
-            pubdate = datetime.datetime.strptime(self.published_date, "%a, %d %b %Y %H:%M:%S %Z")
-            self.published_date = datetime.datetime.strftime(pubdate, "%Y-%d-%m, %H:%M:%S")
+            final_time = tag.string.split(":")
+            min_sec = final_time[2]
+            seconds = min_sec[:2]
+            final_time[0] += ":"+final_time[1]
+            final_time[0] += ":"+seconds
+
+            self.published_date = str(datetime.datetime.strptime(final_time[0], "%a, %d %b %Y %H:%M:%S"))
         except AttributeError:
             self.published_date = None
 
