@@ -8,9 +8,9 @@ on:
 
 env:
   REGISTRY: quay.io
-  IMAGE_NAME: iheartradio/episodeingestion
-  TEST_TAG: iheartradio/episodeingestion:test
-  REPO_NAME: episodeingestion
+  IMAGE_NAME: iheartradio/pyPodcastParser
+  TEST_TAG: iheartradio/pyPodcastParser:test
+  REPO_NAME: pyPodcastParser
 
 jobs:
   build:
@@ -66,10 +66,10 @@ jobs:
       - name: Build Image
         run: |
           CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain content-platform --domain-owner 827541288795 --query authorizationToken --output text ` &&  pip config set global.extra-index-url https://aws:$CODEARTIFACT_AUTH_TOKEN@content-platform-827541288795.d.codeartifact.us-east-1.amazonaws.com/pypi/content-platform/simple/
-          docker build --build-arg CODEARTIFACT_AUTH_TOKEN=$CODEARTIFACT_AUTH_TOKEN  -t quay.io/iheartradio/episodeingestion:${{steps.gitinfo.outputs.tag}} .
+          docker build --build-arg CODEARTIFACT_AUTH_TOKEN=$CODEARTIFACT_AUTH_TOKEN  -t quay.io/iheartradio/pyPodcastParser:${{steps.gitinfo.outputs.tag}} .
       - name: Push Image
         run: |
-          docker push quay.io/iheartradio/episodeingestion:${{steps.gitinfo.outputs.tag}}
+          docker push quay.io/iheartradio/pyPodcastParser:${{steps.gitinfo.outputs.tag}}
       - name: Notify slack success
         if: success()
         env:
