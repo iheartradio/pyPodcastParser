@@ -139,6 +139,17 @@ If you redeploy a new version of the same version tag, clear pip cache in depend
 * title (string): The title of item.
 * date_time (datetime): When published
 
+## How to Verify Changes.
+
+* Run tox
+
+* Make sure GHA passes
+
+* Test all services that will include the package (revise and episode ingestion)
+
+
+
+
 
 ## Links/Known issues
 NA
