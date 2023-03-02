@@ -1,27 +1,64 @@
-###############
-pypodcastparser
-###############
+
+# pyPodcastParser
+
 
 pypodcastparser is a podcast parser. It should parse any RSS file, but it specializes in parsing podcast rss feeds. pypodcastparser is agnostic about the method you use to get a podcast RSS feed. Most users will be comfortable with the Requests library.
 
 
 .. _Requests: http://docs.python-requests.org/en/latest/
 
-************
-Installation
-************
+
+## Installation
+Before you start:
+
+- Services should always be run inside of virtualenvs_.
+- Dependencies are managed with pip_ and pip-tools_. Virtualenvs come with
+  pip preinstalled; pip-tools should be installed manually with ``python -m pip
+  install pip-tools``.
+- Make sure you have follow the steps
+[here](https://github.com/iheartradio/content-platform-documentation/blob/master/private_python_modules/README.md)
+so you can download our private repositories.
+
+Before the first run of the service::
+
+    $ pip install pip-tools
+    $ pip install -r requirements-dev.txt
+    $ pre-commit install
+    $ pip-compile requirements-public.in
+    $ pip install -r requirements-public.txt
+    $ pip-compile requirements-private.in
+    $ pip install -r requirements-private.txt
+
+.. _virtualenvs: https://virtualenv.pypa.io/
+.. _pip: https://pip.pypa.io/
+.. _pip-tools: https://github.com/nvie/pip-tools/
 
 
-::
+# Running tests locally
 
-   pip install pypodcastparser
+Run test suite:
+
+`tox`
+
+# Deploying a new version
+
+To manually deploy/test a new version:
+
+- Increment the version in setup.py, make sure CodeArtifact doesn't already have a repo for that version
+
+- Make sure `dist` directory is empty, then follow instructions [here](https://github.com/iheartradio/content-platform-documentation/blob/master/private_python_modules/README.md#publishing-with-twine)
+
+If you redeploy a new version of the same version tag, clear pip cache in dependent repos:
+`rm -rf ~/Library/Caches/pip/*`
 
 
-*****
-Usage
-*****
+## Service Installation
 
-::
+   $ pip install pypodcastparser
+
+
+## Usage
+
 
    from pypodcastparser.Podcast import Podcast
    import requests
@@ -30,9 +67,9 @@ Usage
    podcast = Podcast(response.content)
 
 
-===================================
-Objects and their Useful Attributes
-===================================
+
+## Objects and their Useful Attributes
+
 
 **Notes:**
 
@@ -40,9 +77,9 @@ Objects and their Useful Attributes
 * Attributes are generally strings or lists of strings, because we want to record the literal value of elements.
 * The cloud element aka RSS Cloud is not supported as it has been superseded by the superior PubSubHubbub protocal
 
--------
-Podcast
--------
+
+## Podcast
+
 
 * categories (list) A list for strings representing the feed categories
 * copyright (string): The feed's copyright
@@ -76,9 +113,9 @@ Podcast
 * web_master (string): The feed's webmaster
 * date_time (datetime): When published
 
-----
-Item
-----
+
+## Item
+
 
 * author (string): The author of the item
 * comments (string): URL of comments
@@ -101,3 +138,10 @@ Item
 * published_date (string): Date item was published
 * title (string): The title of item.
 * date_time (datetime): When published
+
+
+## Links/Known issues
+NA
+
+## Notes
+NA
