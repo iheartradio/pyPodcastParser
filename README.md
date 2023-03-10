@@ -24,10 +24,9 @@ Before the first run of the service::
     $ pip install pip-tools
     $ pip install -r requirements-dev.txt
     $ pre-commit install
-    $ pip-compile requirements-public.in
-    $ pip install -r requirements-public.txt
-    $ pip-compile requirements-private.in
-    $ pip install -r requirements-private.txt
+    $ pip-compile requirements.in
+    $ pip install -r requirements.txt
+
 
 .. _virtualenvs: https://virtualenv.pypa.io/
 .. _pip: https://pip.pypa.io/
