@@ -20,7 +20,6 @@ setup(
 
     author='Christian Paul, Jason Rigden',
     author_email='christianpaul@iheartmedia.com, jasonrigden@gmail.com',
-    author_email='christianpaul@iheartmedia.com, jasonrigden@gmail.com',
 
     license='MIT',
 

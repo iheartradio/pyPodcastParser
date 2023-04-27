@@ -558,6 +558,7 @@ class TestItunesEpisodeParsingWithTranscription(unittest.TestCase):
         self.assertEqual(self.podcast.items[0].podcast_transcript, "https://mp3s.nashownotes.com/PC20-113-Captions.plaintextfilelol")
         self.assertEqual(self.podcast.items[1].podcast_transcript, "https://mp3s.nashownotes.com/PC20-113-Captions.anotherplaintextfile")
         self.assertEqual(self.podcast.items[2].podcast_transcript, "https://mp3s.nashownotes.com/PC20-113-Captions.srt")
+        self.assertEqual(self.podcast.items[3].podcast_transcript, None)
 
 
 if __name__ == '__main__':

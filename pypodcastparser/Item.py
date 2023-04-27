@@ -97,7 +97,7 @@ class Item(object):
         self.date_time = None
         self.interactive = None
         self.is_interactive = None
-        self.podcast_transcript = []
+        self.podcast_transcript = None
 
         tag_methods = {
             (None, 'title'): self.set_title,
@@ -179,6 +179,7 @@ class Item(object):
         item['episode_title'] = self.title
         item['interactive'] = self.interactive
         item['external_url'] = self.enclosure_url
+        item["transcription_url"] = self.podcast_transcript
 
 
         return item
@@ -344,7 +345,7 @@ class Item(object):
                     if transcript['type'] == 'text/plain':
                         self.podcast_transcript = transcript["url"]
                         return
-            self.podcast_transcript = tag.get('url')
+            self.podcast_transcript = tag.get('url',None)
         except AttributeError:
             self.podcast_transcript = None
     
