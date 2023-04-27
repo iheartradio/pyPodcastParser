@@ -29,7 +29,6 @@ common_timezones= {'GMT' : "GMT",
 'CAT' : 'Africa/Maputo' ,
     }
 
-
 class Item(object):
     """Parses an xml rss feed
 
@@ -71,6 +70,7 @@ class Item(object):
 
     def __init__(self, soup):
         self.soup = soup
+        self.transcriptionList = []
 
         # Initialize attributes as they might not be populated
         self.author = None
@@ -97,6 +97,7 @@ class Item(object):
         self.date_time = None
         self.interactive = None
         self.is_interactive = None
+        self.podcast_transcript = []
 
         tag_methods = {
             (None, 'title'): self.set_title,
@@ -115,6 +116,7 @@ class Item(object):
             ('itunes', 'duration'): self.set_itunes_duration,
             ('itunes', 'explicit'): self.set_itunes_explicit,
             ('itunes', 'image'): self.set_itunes_image,
+            ('podcast', 'transcript'): self.set_podcast_transcript,
             ('itunes', 'order'): self.set_itunes_order,
             ('itunes', 'subtitle'): self.set_itunes_subtitle,
             ('itunes', 'summary'): self.set_itunes_summary,
@@ -127,9 +129,14 @@ class Item(object):
             if not isinstance(c, Tag):
                 continue
             try:
+                # Using get instead of pop since there can be multiple transcript tags (meaning we don't want to get rid of method after use)
+                if c.name == "transcript":
+                    tag_method = tag_methods.get((c.prefix, c.name))
+                else:
                 # Pop method to skip duplicated tag on invalid feeds
-                tag_method = tag_methods.pop((c.prefix, c.name))
-            except (AttributeError, KeyError):
+                    tag_method = tag_methods.pop((c.prefix, c.name))
+            except (AttributeError, KeyError) as e:
+                LOGGER.error(e)
                 continue
 
             tag_method(c)
@@ -291,7 +298,7 @@ class Item(object):
             else:
                 LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
 
-        except Exception as e:
+        except Exception:
             self.published_date = datetime.datetime.now(pytz.timezone('US/Eastern')).strftime("%Y-%m-%d %H:%M")
 
 
@@ -319,6 +326,30 @@ class Item(object):
         except AttributeError:
             self.itunes_episode = '0'
 
+        
+
+    def set_podcast_transcript(self, tag):
+        """Parses the episode transcript and sets value
+        If there are multiple transcripts, it will get the one with the highest quality, i.e: text/plain, 
+        otherwise it will get the most recently read one (the last one in the list)
+        """
+        try:
+            transcript_dict = {}
+            transcript_dict['url'] = tag.get('url',None)
+            transcript_dict['type'] = tag.get('type',None)
+            self.transcriptionList.append(transcript_dict)
+            #Getting the transcript with the highest quality, i.e: text/plain
+            if len(self.transcriptionList) > 1 :
+                for transcript in self.transcriptionList:
+                    if transcript['type'] == 'text/plain':
+                        self.podcast_transcript = transcript["url"]
+                        return
+            self.podcast_transcript = tag.get('url')
+        except AttributeError:
+            self.podcast_transcript = None
+    
+
+            
     def set_itunes_season(self, tag):
         """Parses the episode season and sets value"""
         try:

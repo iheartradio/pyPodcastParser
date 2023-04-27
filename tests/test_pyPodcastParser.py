@@ -545,6 +545,20 @@ class TestItunesEpisodesParsing(unittest.TestCase):
     def test_episode_parsing_explicit(self):
         self.assertEqual(self.podcast.items[0].itunes_explicit, False)
 
+class TestItunesEpisodeParsingWithTranscription(unittest.TestCase):
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        test_feeds_dir = os.path.join(test_dir, 'test_feeds')
+        basic_podcast_path = os.path.join(test_feeds_dir, 'episode_parsing.rss')
+        basic_podcast_file = open(basic_podcast_path, "rb")
+        self.basic_podcast = basic_podcast_file.read()
+        self.podcast = Podcast.Podcast(self.basic_podcast)
+
+    def test_episode_parsing_transcription_data(self):
+        self.assertEqual(self.podcast.items[0].podcast_transcript, "https://mp3s.nashownotes.com/PC20-113-Captions.plaintextfilelol")
+        self.assertEqual(self.podcast.items[1].podcast_transcript, "https://mp3s.nashownotes.com/PC20-113-Captions.anotherplaintextfile")
+        self.assertEqual(self.podcast.items[2].podcast_transcript, "https://mp3s.nashownotes.com/PC20-113-Captions.srt")
+
 
 if __name__ == '__main__':
     unittest.main()

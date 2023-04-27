@@ -36,8 +36,6 @@ Host Seth Ferguson and guests delve into how real estate investors set goals, so
 Host Seth Ferguson and guests delve into how real estate investors set goals, source deals, negotiate, leverage, raise capital, and profit from their real estate portfolio.]]></description>
 		<itunes:type>episodic</itunes:type>
 
-
-
 		<podcast:locked owner="seth@purchasetoprofits.com">no</podcast:locked>
 
 		<item>
@@ -58,6 +56,8 @@ Host Seth Ferguson and guests delve into how real estate investors set goals, so
 			<itunes:episode>0</itunes:episode>
 			<itunes:episodeType>full</itunes:episodeType>
 			<itunes:author>Seth Ferguson</itunes:author>
+			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-113-Captions.srt" type="application/srt"/>
+			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-113-Captions.plaintextfilelol" type="text/plain"/>
 		</item>
 		<item>
 			<title>Institutional SFR with Adam Stern</title>
@@ -77,4 +77,26 @@ Host Seth Ferguson and guests delve into how real estate investors set goals, so
 			<itunes:episode>0</itunes:episode>
 			<itunes:episodeType>full</itunes:episodeType>
 			<itunes:author>Seth Ferguson</itunes:author>
+			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-113-Captions.anotherplaintextfile" type="text/plain"/>
+			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-113-Captions.srt" type="application/srt"/>
+		</item>
+		<item>
+			<title>Institutional SFR with Adam Stern</title>
+			<itunes:title>Institutional SFR with Adam Stern</itunes:title>
+			<pubDate>Mon, 19 Jul 2021 16:14:29 +0000 EST</pubDate>
+			<guid isPermaLink="false"><![CDATA[3d8e3670-30d5-43c6-b067-0fe8f3dabf31]]></guid>
+			<link><![CDATA[https://traffic.libsyn.com/secure/sethferguson/295.Adam_Stern.mp3]]></link>
+			<itunes:image href="https://ssl-static.libsyn.com/p/assets/e/5/e/5/e5e51d8fcc767c92e55e3c100dce7605/RWTRE_Teaser_Templates.png" />
+			<description>test</description>
+			<content:encoded><![CDATA[<p>Adam has spent the last 10 years in the Institutional SFR Industry having co-founded a real estate technology and brokerage company in early 2010 which he sold in 2018. He spent years brokering large and medium-sized SFR portfolios for many large SFR REITs as well as mid-sized SFR investment firms. Later he founded Strata SFR focusing on the new construction, build for rent market where he sources opportunities by coordinating transactions for SFR REITs, private equity firms, and multi-family investors by coordinating projects with landowners, developers, and builders to create single site detached single-family and townhome communities.</p> <p>Connect with Adam Stern:</p> <p> Website: https://stratasfr.com/</p> <p> Connect with Seth Ferguson: http://www.SethFerguson.org</p> <p> 📞 ONE-ON-ONE CALL: Interested in learning more about real estate investing? I'm opening up my schedule to speak with people who are serious about learning about how real estate investing can significantly impact their lives.</p> <p>👉 Go to http://www.CallSeth.com to book a 20-minute call. 👈 🏦 FREE DOWNLOAD - The Top 7 Key Market Drivers Every Real Estate Investor Must Know: http://www.TopMarketDrivers.com</p>]]></content:encoded>
+			<enclosure length="66054313" type="audio/mpeg" url="https://traffic.libsyn.com/secure/sethferguson/295.Adam_Stern.mp3?dest-id=1181615" />
+			<itunes:duration>27:32</itunes:duration>
+			<itunes:explicit>false</itunes:explicit>
+			<itunes:season>0</itunes:season>
+			<itunes:keywords />
+			<itunes:subtitle><![CDATA[Adam has spent the last 10 years in the Institutional SFR Industry having co-founded a real estate technology and brokerage company in early 2010 which he sold in 2018. He spent years brokering large and medium-sized SFR portfolios for many large SFR...]]></itunes:subtitle>
+			<itunes:episode>0</itunes:episode>
+			<itunes:episodeType>full</itunes:episodeType>
+			<itunes:author>Seth Ferguson</itunes:author>
+			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-113-Captions.srt" type="application/srt"/>
 		</item>

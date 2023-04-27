@@ -5,13 +5,13 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
     name='pypodcastparser-ihr',
 
-    version='1.5.0',
+    version='1.6.0-dev',
 
     description='pypodcastparser is a podcast parser.',
     long_description=long_description,
@@ -19,6 +19,7 @@ setup(
     url='https://github.com/iheartradio/pypodcastparser',
 
     author='Christian Paul, Jason Rigden',
+    author_email='christianpaul@iheartmedia.com, jasonrigden@gmail.com',
     author_email='christianpaul@iheartmedia.com, jasonrigden@gmail.com',
 
     license='MIT',
