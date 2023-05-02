@@ -554,12 +554,20 @@ class TestItunesEpisodeParsingWithTranscription(unittest.TestCase):
         self.basic_podcast = basic_podcast_file.read()
         self.podcast = Podcast.Podcast(self.basic_podcast)
 
-    def test_episode_parsing_transcription_data(self):
-        self.assertEqual(self.podcast.items[0].podcast_transcript, "https://mp3s.nashownotes.com/PC20-113-Captions.plaintextfilelol")
-        self.assertEqual(self.podcast.items[1].podcast_transcript, "https://mp3s.nashownotes.com/PC20-113-Captions.anotherplaintextfile")
-        self.assertEqual(self.podcast.items[2].podcast_transcript, "https://mp3s.nashownotes.com/PC20-113-Captions.srt")
-        self.assertEqual(self.podcast.items[3].podcast_transcript, None)
+    def test_transcript_is_list_of_dictionaries(self):
+        self.assertIsNotNone(self.podcast.items[0].podcast_transcript)
 
+    def test_episode_parsing_transcription_data_episode_transcription(self):
+        print(self.podcast.items[0].podcast_transcript)
+        self.assertEqual(self.podcast.items[0].podcast_transcript[0].get("url"), "episode_1_srt")
+        self.assertEqual(self.podcast.items[0].podcast_transcript[0].get("type"), "application/srt")
+        self.assertEqual(self.podcast.items[0].podcast_transcript[0].get("language"), None)
+        self.assertEqual(self.podcast.items[0].podcast_transcript[1].get("url"), 'episode_1_plain')
+        self.assertEqual(self.podcast.items[0].podcast_transcript[1].get("type"), "text/plain")
+        self.assertEqual(self.podcast.items[0].podcast_transcript[1].get("language"), None)
+        self.assertEqual(self.podcast.items[1].podcast_transcript[1].get("url"), 'episode_2_srt_with_language')
+        self.assertEqual(self.podcast.items[1].podcast_transcript[1].get("type"), "application/srt")
+        self.assertEqual(self.podcast.items[1].podcast_transcript[1].get("language"), "US-en")
 
 if __name__ == '__main__':
     unittest.main()

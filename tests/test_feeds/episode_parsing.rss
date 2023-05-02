@@ -56,8 +56,8 @@ Host Seth Ferguson and guests delve into how real estate investors set goals, so
 			<itunes:episode>0</itunes:episode>
 			<itunes:episodeType>full</itunes:episodeType>
 			<itunes:author>Seth Ferguson</itunes:author>
-			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-113-Captions.srt" type="application/srt"/>
-			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-113-Captions.plaintextfilelol" type="text/plain"/>
+			<podcast:transcript url="episode_1_srt" type="application/srt"/>
+			<podcast:transcript url="episode_1_plain" type="text/plain"/>
 		</item>
 		<item>
 			<title>Institutional SFR with Adam Stern</title>
@@ -77,8 +77,8 @@ Host Seth Ferguson and guests delve into how real estate investors set goals, so
 			<itunes:episode>0</itunes:episode>
 			<itunes:episodeType>full</itunes:episodeType>
 			<itunes:author>Seth Ferguson</itunes:author>
-			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-113-Captions.anotherplaintextfile" type="text/plain"/>
-			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-113-Captions.srt" type="application/srt"/>
+			<podcast:transcript url="episode_2_transcription_plain" type="text/plain"/>
+			<podcast:transcript url="episode_2_srt_with_language" type="application/srt" language="US-en"/>
 		</item>
 		<item>
 			<title>Institutional SFR with Adam Stern</title>
@@ -98,7 +98,7 @@ Host Seth Ferguson and guests delve into how real estate investors set goals, so
 			<itunes:episode>0</itunes:episode>
 			<itunes:episodeType>full</itunes:episodeType>
 			<itunes:author>Seth Ferguson</itunes:author>
-			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-113-Captions.srt" type="application/srt"/>
+			<podcast:transcript url="https://mp3s.nashownotes.com/PC20-110-Captions.srt" type="application/srt"/>
 		</item>
 		<item>
 			<title>Institutional SFR with Adam Stern</title>

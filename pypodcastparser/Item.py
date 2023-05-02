@@ -70,7 +70,6 @@ class Item(object):
 
     def __init__(self, soup):
         self.soup = soup
-        self.transcriptionList = []
 
         # Initialize attributes as they might not be populated
         self.author = None
@@ -98,6 +97,7 @@ class Item(object):
         self.interactive = None
         self.is_interactive = None
         self.podcast_transcript = None
+        self.transcriptionList = []
 
         tag_methods = {
             (None, 'title'): self.set_title,
@@ -136,7 +136,6 @@ class Item(object):
                 # Pop method to skip duplicated tag on invalid feeds
                     tag_method = tag_methods.pop((c.prefix, c.name))
             except (AttributeError, KeyError) as e:
-                LOGGER.error(e)
                 continue
 
             tag_method(c)
@@ -327,8 +326,6 @@ class Item(object):
         except AttributeError:
             self.itunes_episode = '0'
 
-        
-
     def set_podcast_transcript(self, tag):
         """Parses the episode transcript and sets value
         If there are multiple transcripts, it will get the one with the highest quality, i.e: text/plain, 
@@ -338,14 +335,10 @@ class Item(object):
             transcript_dict = {}
             transcript_dict['url'] = tag.get('url',None)
             transcript_dict['type'] = tag.get('type',None)
+            transcript_dict['language'] = tag.get("language",None)
             self.transcriptionList.append(transcript_dict)
-            #Getting the transcript with the highest quality, i.e: text/plain
-            if len(self.transcriptionList) > 1 :
-                for transcript in self.transcriptionList:
-                    if transcript['type'] == 'text/plain':
-                        self.podcast_transcript = transcript["url"]
-                        return
-            self.podcast_transcript = tag.get('url',None)
+            transcriptionList1 = self.transcriptionList
+            self.podcast_transcript = transcriptionList1
         except AttributeError:
             self.podcast_transcript = None
     
