@@ -178,7 +178,7 @@ class Item(object):
         item['episode_title'] = self.title
         item['interactive'] = self.interactive
         item['external_url'] = self.enclosure_url
-        item["transcription_url"] = self.podcast_transcript
+        item["transcription"] = self.podcast_transcript
 
 
         return item
