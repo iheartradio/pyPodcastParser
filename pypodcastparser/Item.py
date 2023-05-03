@@ -336,6 +336,7 @@ class Item(object):
             transcript_dict['url'] = tag.get('url',None)
             transcript_dict['type'] = tag.get('type',None)
             transcript_dict['language'] = tag.get("language",None)
+            transcript_dict['rel'] = tag.get('rel', None)
             self.transcriptionList.append(transcript_dict)
             transcriptionList1 = self.transcriptionList
             self.podcast_transcript = transcriptionList1
