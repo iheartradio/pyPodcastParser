@@ -3,7 +3,6 @@ from bs4 import Tag
 import datetime
 from datetime import timezone
 import email.utils
-from dateutil.parser import parse
 import re
 import pytz
 import logging
