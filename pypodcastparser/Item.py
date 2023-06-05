@@ -27,7 +27,8 @@ common_timezones= {'GMT' : "GMT",
 'PST' : 'US/Pacific' ,
 'CST' : 'US/Central' ,
 'CAT' : 'Africa/Maputo' ,
-    }
+'AEST' : 'Australia/Sydney'
+}
 
 
 class Item(object):
@@ -241,6 +242,9 @@ class Item(object):
             published_date_timezone=""
             if (re.match("^[a-zA-Z]{3}$", deconstructed_date[-1])):
                 published_date_timezone= deconstructed_date[-1]
+                deconstructed_date.pop()
+            elif "+1000" in self.published_date:
+                published_date_timezone= 'AEST'
                 deconstructed_date.pop()
             else:
                 published_date_timezone= 'EST'
