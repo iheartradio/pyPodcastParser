@@ -490,9 +490,8 @@ class TestItunesEpisodes(unittest.TestCase):
         self.assertEqual(self.podcast.items[2].published_date,'2022-05-30 00:05:03')
         current_time= datetime.datetime.now(pytz.timezone('US/Eastern')).strftime("%Y-%m-%d %H:%M")
         self.assertEqual(self.podcast.items[3].published_date, current_time)
-        self.assertEqual(self.podcast.items[4].published_date,'2023-05-22 00:00:00')
-    
-
+        self.assertEqual(self.podcast.items[4].published_date,'2023-05-22 00:00:00')   
+        self.assertEqual(self.podcast.items[5].published_date,'2023-07-06 04:00:00') # PDT TO EST
 
 
     def test_episode_meta_data_external_image_url(self):

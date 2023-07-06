@@ -27,7 +27,8 @@ common_timezones= {'GMT' : "GMT",
 'PST' : 'US/Pacific' ,
 'CST' : 'US/Central' ,
 'CAT' : 'Africa/Maputo' ,
-'AEST' : 'Australia/Sydney'
+'AEST' : 'Australia/Sydney',
+'PDT' : 'America/Los_Angeles'
 }
 
 
