@@ -126,7 +126,7 @@ class TestBasicFeedItems(unittest.TestCase):
     def test_item_title(self):
         self.assertEqual(self.podcast.items[0].title, "basic item title")
         self.assertEqual(self.podcast.items[1].title, "another basic item title")
-
+    
 
 class TestBasicFeed(unittest.TestCase):
 
@@ -521,6 +521,9 @@ class TestItunesEpisodes(unittest.TestCase):
         self.assertEqual(self.podcast.items[0].description,'description')
         self.assertEqual(self.podcast.items[1].description,'description')
 
+    def test_transcription_is_none(self):
+        self.assertEqual(self.podcast.items[0].podcast_transcript, None)
+
 
 class TestItunesEpisodesParsing(unittest.TestCase):
 
@@ -547,6 +550,31 @@ class TestItunesEpisodesParsing(unittest.TestCase):
     def test_episode_parsing_explicit(self):
         self.assertEqual(self.podcast.items[0].itunes_explicit, False)
 
+class TestItunesEpisodeParsingWithTranscription(unittest.TestCase):
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        test_feeds_dir = os.path.join(test_dir, 'test_feeds')
+        basic_podcast_path = os.path.join(test_feeds_dir, 'episode_parsing.rss')
+        basic_podcast_file = open(basic_podcast_path, "rb")
+        self.basic_podcast = basic_podcast_file.read()
+        self.podcast = Podcast.Podcast(self.basic_podcast)
+
+    def test_transcript_is_list_of_dictionaries(self):
+        self.assertIsNotNone(self.podcast.items[0].podcast_transcript)
+
+    def test_episode_parsing_transcription_data_episode_transcription(self):
+        print(self.podcast.items[0].podcast_transcript)
+        self.assertEqual(self.podcast.items[0].podcast_transcript[0].get("url"), "episode_1_srt")
+        self.assertEqual(self.podcast.items[0].podcast_transcript[0].get("type"), "application/srt")
+        self.assertEqual(self.podcast.items[0].podcast_transcript[0].get("language"), None)
+        self.assertEqual(self.podcast.items[0].podcast_transcript[0].get("rel"), None)
+        self.assertEqual(self.podcast.items[0].podcast_transcript[1].get("url"), 'episode_1_plain')
+        self.assertEqual(self.podcast.items[0].podcast_transcript[1].get("type"), "text/plain")
+        self.assertEqual(self.podcast.items[0].podcast_transcript[1].get("language"), None)
+        self.assertEqual(self.podcast.items[0].podcast_transcript[1].get("rel"), "relation")
+        self.assertEqual(self.podcast.items[1].podcast_transcript[1].get("url"), 'episode_2_srt_with_language')
+        self.assertEqual(self.podcast.items[1].podcast_transcript[1].get("type"), "application/srt")
+        self.assertEqual(self.podcast.items[1].podcast_transcript[1].get("language"), "US-en")
 
 if __name__ == '__main__':
     unittest.main()
