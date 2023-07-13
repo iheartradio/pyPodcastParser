@@ -94,39 +94,39 @@ class Podcast:
 
         self.set_soup()
         tag_methods = {
-            (None, 'copyright'): self.set_copyright,
-            (None, 'description'): self.set_description,
-            (None, 'image'): self.set_image,
-            (None, 'language'): self.set_language,
-            (None, 'lastBuildDate'): self.set_last_build_date,
-            (None, 'link'): self.set_link,
-            (None, 'pubDate'): self.set_published_date,
-            (None, 'title'): self.set_title,
-            (None, 'item'): self.add_item,
-            (None, 'is_interactive'): self.is_interactive,
-            ('itunes', 'author'): self.set_itunes_author_name,
-            ('itunes', 'type'): self.set_itunes_type,
-            ('itunes', 'block'): self.set_itunes_block,
-            ('itunes', 'category'): self.add_itunes_category,
-            ('itunes', 'complete'): self.set_itunes_complete,
-            ('itunes', 'explicit'): self.set_itunes_explicit,
-            ('itunes', 'image'): self.set_itunes_image,
-            ('itunes', 'keywords'): self.set_itunes_keywords,
-            ('itunes', 'new-feed-url'): self.set_itunes_new_feed_url,
-            ('itunes', 'owner'): self.set_owner,
-            ('itunes', 'subtitle'): self.set_subtitle,
-            ('itunes', 'summary'): self.set_summary,
-            ('ihr', 'interactive'): self.set_interactive,
+            (None, "copyright"): self.set_copyright,
+            (None, "description"): self.set_description,
+            (None, "image"): self.set_image,
+            (None, "language"): self.set_language,
+            (None, "lastBuildDate"): self.set_last_build_date,
+            (None, "link"): self.set_link,
+            (None, "pubDate"): self.set_published_date,
+            (None, "title"): self.set_title,
+            (None, "item"): self.add_item,
+            (None, "is_interactive"): self.is_interactive,
+            ("itunes", "author"): self.set_itunes_author_name,
+            ("itunes", "type"): self.set_itunes_type,
+            ("itunes", "block"): self.set_itunes_block,
+            ("itunes", "category"): self.add_itunes_category,
+            ("itunes", "complete"): self.set_itunes_complete,
+            ("itunes", "explicit"): self.set_itunes_explicit,
+            ("itunes", "image"): self.set_itunes_image,
+            ("itunes", "keywords"): self.set_itunes_keywords,
+            ("itunes", "new-feed-url"): self.set_itunes_new_feed_url,
+            ("itunes", "owner"): self.set_owner,
+            ("itunes", "subtitle"): self.set_subtitle,
+            ("itunes", "summary"): self.set_summary,
+            ("ihr", "interactive"): self.set_interactive,
         }
         many_tag_methods = set(
-            [(None, 'item'), ('itunes', 'category'), ('itunes', 'keywords')]
+            [(None, "item"), ("itunes", "category"), ("itunes", "keywords")]
         )
 
         try:
             channel = self.soup.rss.channel
             channel_items = channel.children
         except AttributeError:
-            raise InvalidPodcastFeed('Invalid Podcast Feed')
+            raise InvalidPodcastFeed("Invalid Podcast Feed")
 
         # Populate attributes based on feed content
         for c in channel_items:
@@ -145,7 +145,7 @@ class Podcast:
             tag_method(c)
 
         if not self.items:
-            for item in self.soup.find_all('item'):
+            for item in self.soup.find_all("item"):
                 self.add_item(item)
 
         self.set_time_published()
@@ -173,48 +173,44 @@ class Podcast:
     def to_dict(self):
         """Create dict representation of Podcast object."""
         podcast_dict = {}
-        podcast_dict['copyright'] = self.copyright
-        podcast_dict['description'] = self.description
-        podcast_dict['image_url'] = self.image_url
-        podcast_dict['items'] = []
+        podcast_dict["copyright"] = self.copyright
+        podcast_dict["description"] = self.description
+        podcast_dict["image_url"] = self.image_url
+        podcast_dict["items"] = []
         for item in self.items:
             item_dict = item.to_dict()
-            podcast_dict['items'].append(item_dict)
-        podcast_dict['itunes_author_name'] = self.itunes_author_name
-        podcast_dict['itunes_block'] = self.itunes_block
-        podcast_dict['itunes_categories'] = self.itunes_categories
-        podcast_dict['itunes_block'] = self.itunes_block
-        podcast_dict['itunes_explicit'] = self.itunes_explicit
-        podcast_dict['itunes_image'] = self.itunes_image
-        podcast_dict['itunes_keywords'] = self.itunes_keywords
-        podcast_dict['itunes_explicit'] = self.itunes_explicit
-        podcast_dict['itunes_new_feed_url'] = self.itunes_new_feed_url
-        podcast_dict['language'] = self.language
-        podcast_dict['last_build_date'] = self.last_build_date
-        podcast_dict['link'] = self.link
-        podcast_dict['published_date'] = self.published_date
-        podcast_dict['owner_name'] = self.owner_name
-        podcast_dict['owner_email'] = self.owner_email
-        podcast_dict['subtitle'] = self.subtitle
-        podcast_dict['title'] = self.title
-        podcast_dict['itunes_type'] = self.itunes_type
+            podcast_dict["items"].append(item_dict)
+        podcast_dict["itunes_author_name"] = self.itunes_author_name
+        podcast_dict["itunes_block"] = self.itunes_block
+        podcast_dict["itunes_categories"] = self.itunes_categories
+        podcast_dict["itunes_block"] = self.itunes_block
+        podcast_dict["itunes_explicit"] = self.itunes_explicit
+        podcast_dict["itunes_image"] = self.itunes_image
+        podcast_dict["itunes_keywords"] = self.itunes_keywords
+        podcast_dict["itunes_explicit"] = self.itunes_explicit
+        podcast_dict["itunes_new_feed_url"] = self.itunes_new_feed_url
+        podcast_dict["language"] = self.language
+        podcast_dict["last_build_date"] = self.last_build_date
+        podcast_dict["link"] = self.link
+        podcast_dict["published_date"] = self.published_date
+        podcast_dict["owner_name"] = self.owner_name
+        podcast_dict["owner_email"] = self.owner_email
+        podcast_dict["subtitle"] = self.subtitle
+        podcast_dict["title"] = self.title
+        podcast_dict["itunes_type"] = self.itunes_type
         return podcast_dict
 
     def set_soup(self):
         """Sets soup"""
-        if self.feed_content.startswith(b'<?xml'):
+        if self.feed_content.startswith(b"<?xml"):
             self.soup = BeautifulSoup(self.feed_content, features="lxml-xml")
         else:
             c = self.feed_content
             try:
-                recovered_content = c[c.index(b'<?xml'):]
-                self.soup = BeautifulSoup(
-                    recovered_content, features="lxml-xml"
-                )
+                recovered_content = c[c.index(b"<?xml") :]
+                self.soup = BeautifulSoup(recovered_content, features="lxml-xml")
             except Exception:
-                self.soup = BeautifulSoup(
-                    self.feed_content, features="lxml-xml"
-                )
+                self.soup = BeautifulSoup(self.feed_content, features="lxml-xml")
 
     def add_item(self, tag):
         item = Item(tag)
@@ -237,7 +233,7 @@ class Podcast:
     def set_image(self, tag):
         """Parses image element and set values"""
         try:
-            self.image_url = tag.find('url', recursive=False).string
+            self.image_url = tag.find("url", recursive=False).string
         except AttributeError:
             self.image_url = None
 
@@ -269,7 +265,7 @@ class Podcast:
 
     def add_itunes_category(self, tag):
         """Parses and adds itunes category"""
-        category_text = tag.get('text')
+        category_text = tag.get("text")
 
         # prevent duplicate categories
         if category_text not in self.itunes_categories:
@@ -278,7 +274,9 @@ class Podcast:
         # get subcategories
         for content in tag.contents:
             if (
-                isinstance(content, Tag) and content.prefix == 'itunes' and content.name == 'category'
+                isinstance(content, Tag)
+                and content.prefix == "itunes"
+                and content.name == "category"
             ):
                 self.add_itunes_category(content)
 
@@ -299,26 +297,24 @@ class Podcast:
     def set_itunes_image(self, tag):
         """Parses itunes images and set url as value"""
         try:
-            self.itunes_image = tag.get('href')
+            self.itunes_image = tag.get("href")
         except AttributeError:
             self.itunes_image = None
 
     def set_itunes_keywords(self, tag):
         """Parses and adds itunes keywords"""
         try:
-            keywords_list = tag.string.split(',')
+            keywords_list = tag.string.split(",")
 
             # remove leading and trailing whitespace,
             # remove consecutive whitespace
-            normalized_keywords_list = [
-                ' '.join(kw.split()) for kw in keywords_list
-            ]
+            normalized_keywords_list = [" ".join(kw.split()) for kw in keywords_list]
 
             # remove duplicate keywords
             # remove empty entries
             unique_keywords_list = list(set(normalized_keywords_list))
-            if '' in unique_keywords_list:
-                unique_keywords_list.remove('')
+            if "" in unique_keywords_list:
+                unique_keywords_list.remove("")
 
             self.itunes_keywords = unique_keywords_list
         except AttributeError:
@@ -360,21 +356,23 @@ class Podcast:
             final_time = tag.string.split(":")
             min_sec = final_time[2]
             seconds = min_sec[:2]
-            final_time[0] += ":"+final_time[1]
-            final_time[0] += ":"+seconds
+            final_time[0] += ":" + final_time[1]
+            final_time[0] += ":" + seconds
 
-            self.published_date = str(datetime.datetime.strptime(final_time[0], "%a, %d %b %Y %H:%M:%S"))
+            self.published_date = str(
+                datetime.datetime.strptime(final_time[0], "%a, %d %b %Y %H:%M:%S")
+            )
         except AttributeError:
             self.published_date = None
 
     def set_owner(self, tag):
         """Parses owner name and email then sets value"""
         try:
-            self.owner_name = tag.find('itunes:name', recursive=False).string
+            self.owner_name = tag.find("itunes:name", recursive=False).string
         except AttributeError:
             self.owner_name = None
         try:
-            self.owner_email = tag.find('itunes:email', recursive=False).string
+            self.owner_email = tag.find("itunes:email", recursive=False).string
         except AttributeError:
             self.owner_email = None
 
@@ -402,7 +400,7 @@ class Podcast:
     def set_interactive(self, tag):
         """Parses ihr-interactive and set value"""
         try:
-            self.interactive = (tag.string.lower() == "yes")
+            self.interactive = tag.string.lower() == "yes"
             self.is_interactive = self.interactive
         except AttributeError:
             self.interactive = False

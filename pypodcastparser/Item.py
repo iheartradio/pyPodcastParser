@@ -6,28 +6,32 @@ import email.utils
 import re
 import pytz
 import logging
+
 LOGGER = logging.getLogger(__name__)
 
 
-pytz_timezon_list= [tz for tz in pytz.all_timezones]
-common_timezones= {'GMT' : "GMT",
-'UTC' : 'UTC' ,
-'CET' : 'Europe/Berlin',
-'EET' : 'Africa/Cairo' ,
-'EAT' : 'Africa/Addis_Ababa' ,
-'IST' : 'Asia/Kolkata' ,
-'BST' : 'Europe/London' ,
-'JST' : 'Asia/Tokyo' ,
-'ACT' : 'Australia/ACT' ,
-'SST' : 'Pacific/Pago_Pago' ,
-'NST' : 'America/St_Johns' ,
-'HST' : 'America/Adak' ,
-'AST' : 'America/Puerto_Rico' ,
-'PST' : 'US/Pacific' ,
-'CST' : 'US/Central' ,
-'CAT' : 'Africa/Maputo' ,
-'AEST' : 'Australia/Sydney'
+pytz_timezon_list = [tz for tz in pytz.all_timezones]
+common_timezones = {
+    "GMT": "GMT",
+    "UTC": "UTC",
+    "CET": "Europe/Berlin",
+    "EET": "Africa/Cairo",
+    "EAT": "Africa/Addis_Ababa",
+    "IST": "Asia/Kolkata",
+    "BST": "Europe/London",
+    "JST": "Asia/Tokyo",
+    "ACT": "Australia/ACT",
+    "SST": "Pacific/Pago_Pago",
+    "NST": "America/St_Johns",
+    "HST": "America/Adak",
+    "AST": "America/Puerto_Rico",
+    "PST": "US/Pacific",
+    "CST": "US/Central",
+    "CAT": "Africa/Maputo",
+    "AEST": "Australia/Sydney",
+    "PDT": "America/Los_Angeles",
 }
+
 
 class Item(object):
     """Parses an xml rss feed
@@ -100,28 +104,27 @@ class Item(object):
         self.transcriptionList = []
 
         tag_methods = {
-            (None, 'title'): self.set_title,
-            (None, 'author'): self.set_author,
-            (None, 'description'): self.set_description,
-            (None, 'guid'): self.set_guid,
-            (None, 'pubDate'): self.set_published_date,
-            (None, 'enclosure'): self.set_enclosure,
-            (None, 'is_interactive'): self.is_interactive,
-            ('content', 'encoded'): self.set_content_encoded,
-            ('itunes', 'author'): self.set_itunes_author_name,
-            ('itunes', 'episode'): self.set_itunes_episode,
-            ('itunes', 'episodeType'): self.set_itunes_episode_type,
-            ('itunes', 'block'): self.set_itunes_block,
-            ('itunes', 'season'): self.set_itunes_season,
-            ('itunes', 'duration'): self.set_itunes_duration,
-            ('itunes', 'explicit'): self.set_itunes_explicit,
-            ('itunes', 'image'): self.set_itunes_image,
-            ('podcast', 'transcript'): self.set_podcast_transcript,
-            ('itunes', 'order'): self.set_itunes_order,
-            ('itunes', 'subtitle'): self.set_itunes_subtitle,
-            ('itunes', 'summary'): self.set_itunes_summary,
-            ('ihr', 'interactive'): self.set_interactive,
-
+            (None, "title"): self.set_title,
+            (None, "author"): self.set_author,
+            (None, "description"): self.set_description,
+            (None, "guid"): self.set_guid,
+            (None, "pubDate"): self.set_published_date,
+            (None, "enclosure"): self.set_enclosure,
+            (None, "is_interactive"): self.is_interactive,
+            ("content", "encoded"): self.set_content_encoded,
+            ("itunes", "author"): self.set_itunes_author_name,
+            ("itunes", "episode"): self.set_itunes_episode,
+            ("itunes", "episodeType"): self.set_itunes_episode_type,
+            ("itunes", "block"): self.set_itunes_block,
+            ("itunes", "season"): self.set_itunes_season,
+            ("itunes", "duration"): self.set_itunes_duration,
+            ("itunes", "explicit"): self.set_itunes_explicit,
+            ("itunes", "image"): self.set_itunes_image,
+            ("podcast", "transcript"): self.set_podcast_transcript,
+            ("itunes", "order"): self.set_itunes_order,
+            ("itunes", "subtitle"): self.set_itunes_subtitle,
+            ("itunes", "summary"): self.set_itunes_summary,
+            ("ihr", "interactive"): self.set_interactive,
         }
 
         # Populate attributes based on feed content
@@ -133,9 +136,9 @@ class Item(object):
                 if c.name == "transcript":
                     tag_method = tag_methods.get((c.prefix, c.name))
                 else:
-                # Pop method to skip duplicated tag on invalid feeds
+                    # Pop method to skip duplicated tag on invalid feeds
                     tag_method = tag_methods.pop((c.prefix, c.name))
-            except (AttributeError, KeyError) as e:
+            except (AttributeError, KeyError):
                 continue
 
             tag_method(c)
@@ -164,22 +167,21 @@ class Item(object):
 
     def to_dict(self):
         item = {}
-        item['external_id'] = self.guid
-        item['episode_duration'] = self.itunes_duration
-        item['is_explicit'] = self.itunes_explicit
-        item['episode_number'] = self.itunes_episode
-        item['episode_season'] = self.itunes_season
-        item['episode_type'] = self.itunes_episode_type
-        item['external_image_url'] = self.itunes_image
-        item['episode_subtitle'] = self.itunes_subtitle
-        item['episode_description'] = self.description
-        item['original_air_date'] = self.published_date
-        item['start_date'] = self.published_date
-        item['episode_title'] = self.title
-        item['interactive'] = self.interactive
-        item['external_url'] = self.enclosure_url
+        item["external_id"] = self.guid
+        item["episode_duration"] = self.itunes_duration
+        item["is_explicit"] = self.itunes_explicit
+        item["episode_number"] = self.itunes_episode
+        item["episode_season"] = self.itunes_season
+        item["episode_type"] = self.itunes_episode_type
+        item["external_image_url"] = self.itunes_image
+        item["episode_subtitle"] = self.itunes_subtitle
+        item["episode_description"] = self.description
+        item["original_air_date"] = self.published_date
+        item["start_date"] = self.published_date
+        item["episode_title"] = self.title
+        item["interactive"] = self.interactive
+        item["external_url"] = self.enclosure_url
         item["transcription"] = self.podcast_transcript
-
 
         return item
 
@@ -205,7 +207,7 @@ class Item(object):
         """Parses content_encoded and set value."""
         try:
             self.content_encoded = tag.string
-            if(self.description == None):
+            if self.description == None:
                 self.description = self.content_encoded
         except AttributeError:
             self.content_encoded = None
@@ -213,15 +215,15 @@ class Item(object):
     def set_enclosure(self, tag):
         """Parses enclosure_url, enclosure_type then set values."""
         try:
-            self.enclosure_url = tag['url']
+            self.enclosure_url = tag["url"]
         except Exception:
             self.enclosure_url = None
         try:
-            self.enclosure_type = tag['type']
+            self.enclosure_type = tag["type"]
         except Exception:
             self.enclosure_type = None
         try:
-            self.enclosure_length = tag['length']
+            self.enclosure_length = tag["length"]
             self.enclosure_length = int(self.enclosure_length)
         except Exception:
             self.enclosure_length = None
@@ -233,8 +235,7 @@ class Item(object):
         except AttributeError:
             self.guid = None
 
-
-#TODO convert to one timezone
+    # TODO convert to one timezone
     def set_published_date(self, tag):
         """Parses published date and set value."""
         try:
@@ -242,68 +243,100 @@ class Item(object):
             self.published_date_string = tag.string
 
             deconstructed_date = self.published_date_string.split(" ")
-            if(len(deconstructed_date) < 4):
+            if len(deconstructed_date) < 4:
                 raise AttributeError
 
-            published_date_timezone=""
-            if (re.match("^[a-zA-Z]{3}$", deconstructed_date[-1])):
-                published_date_timezone= deconstructed_date[-1]
+            published_date_timezone = ""
+            if re.match("^[a-zA-Z]{3}$", deconstructed_date[-1]):
+                published_date_timezone = deconstructed_date[-1]
                 deconstructed_date.pop()
             elif "+1000" in self.published_date:
-                published_date_timezone= 'AEST'
+                published_date_timezone = "AEST"
                 deconstructed_date.pop()
             else:
-                published_date_timezone= 'EST'
+                published_date_timezone = "EST"
 
-
-            regex_array = ["^[a-zA-Z]{3},$","^\d{1,2}$","^[a-zA-Z]{3}$","^\d{4}$","^\d\d:\d\d"]
+            regex_array = [
+                "^[a-zA-Z]{3},$",
+                "^\d{1,2}$",
+                "^[a-zA-Z]{3}$",
+                "^\d{4}$",
+                "^\d\d:\d\d",
+            ]
             new_array = []
             for array_index, array_value in enumerate(regex_array):
-                if(re.match(deconstructed_date[array_index],array_value)):
+                if re.match(deconstructed_date[array_index], array_value):
                     new_array.append(array_value)
                 else:
-                    for inner_index,inner_value in enumerate(deconstructed_date):
-                        if(re.match(regex_array[array_index],inner_value)):
+                    for inner_index, inner_value in enumerate(deconstructed_date):
+                        if re.match(regex_array[array_index], inner_value):
                             new_array.append(inner_value)
                             break
-            date_string = new_array[0]+" "+new_array[1]+" "+ new_array[2]+" "+new_array[3]+" "+new_array[4]
+            date_string = (
+                new_array[0]
+                + " "
+                + new_array[1]
+                + " "
+                + new_array[2]
+                + " "
+                + new_array[3]
+                + " "
+                + new_array[4]
+            )
 
-            if(len(new_array) != 5):
-                raise AttributeError("Error creating new date array. Array is not of length 5 for formatting")
+            if len(new_array) != 5:
+                raise AttributeError(
+                    "Error creating new date array. Array is not of length 5 for formatting"
+                )
 
             time = date_string.split(":")
-            if (len(time) == 2):
+            if len(time) == 2:
                 minutes = time[1].split(" ")
-                minutes[0]+=":00"
-                time[0] += ":"+minutes[0]
-                self.published_date = datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S")
+                minutes[0] += ":00"
+                time[0] += ":" + minutes[0]
+                self.published_date = datetime.datetime.strptime(
+                    time[0], "%a, %d %b %Y %H:%M:%S"
+                )
 
-            elif (len(time) == 3):
-                time[0] += ":"+time[1]
+            elif len(time) == 3:
+                time[0] += ":" + time[1]
                 seconds = time[2]
                 seconds_string = seconds[:2]
-                time[0] += ":"+seconds_string
-                self.published_date = datetime.datetime.strptime(time[0], "%a, %d %b %Y %H:%M:%S")
+                time[0] += ":" + seconds_string
+                self.published_date = datetime.datetime.strptime(
+                    time[0], "%a, %d %b %Y %H:%M:%S"
+                )
             else:
                 now = datetime.datetime.now(timezone.utc)
-                published_date_timezone= "UTC"
-                self.published_date = datetime.datetime.strptime(now, "%a, %d %b %Y %H:%M:%S")
+                published_date_timezone = "UTC"
+                self.published_date = datetime.datetime.strptime(
+                    now, "%a, %d %b %Y %H:%M:%S"
+                )
 
-            if published_date_timezone not in ['ET', 'EST', 'EDT']:
+            if published_date_timezone not in ["ET", "EST", "EDT"]:
                 if published_date_timezone in pytz_timezon_list:
                     current_timezone = pytz.timezone(published_date_timezone)
                 else:
-                    current_timezone = pytz.timezone(common_timezones.get(published_date_timezone))
+                    current_timezone = pytz.timezone(
+                        common_timezones.get(published_date_timezone)
+                    )
 
-                date_in_current_timezone = current_timezone.localize(self.published_date)
-                self.published_date = str((date_in_current_timezone.astimezone(pytz.timezone('US/Eastern'))).replace(tzinfo=None))
-                LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
+                date_in_current_timezone = current_timezone.localize(
+                    self.published_date
+                )
+                self.published_date = str(
+                    (
+                        date_in_current_timezone.astimezone(pytz.timezone("US/Eastern"))
+                    ).replace(tzinfo=None)
+                )
+                LOGGER.info("Final Published Date EST: {}".format(self.published_date))
             else:
-                LOGGER.info('Final Published Date EST: {}'.format(self.published_date))
+                LOGGER.info("Final Published Date EST: {}".format(self.published_date))
 
         except Exception:
-            self.published_date = datetime.datetime.now(pytz.timezone('US/Eastern')).strftime("%Y-%m-%d %H:%M")
-
+            self.published_date = datetime.datetime.now(
+                pytz.timezone("US/Eastern")
+            ).strftime("%Y-%m-%d %H:%M")
 
     def set_title(self, tag):
         """Parses title and set value."""
@@ -325,37 +358,34 @@ class Item(object):
             self.itunes_episode = tag.string
 
             if self.itunes_episode == "" or self.itunes_episode == None:
-                self.itunes_episode = '0'
+                self.itunes_episode = "0"
         except AttributeError:
-            self.itunes_episode = '0'
+            self.itunes_episode = "0"
 
     def set_podcast_transcript(self, tag):
         """Parses the episode transcript and sets value
-        If there are multiple transcripts, it will get the one with the highest quality, i.e: text/plain, 
+        If there are multiple transcripts, it will get the one with the highest quality, i.e: text/plain,
         otherwise it will get the most recently read one (the last one in the list)
         """
         try:
             transcript_dict = {}
-            transcript_dict['url'] = tag.get('url',None)
-            transcript_dict['type'] = tag.get('type',None)
-            transcript_dict['language'] = tag.get("language",None)
-            transcript_dict['rel'] = tag.get('rel', None)
+            transcript_dict["url"] = tag.get("url", None)
+            transcript_dict["type"] = tag.get("type", None)
+            transcript_dict["language"] = tag.get("language", None)
+            transcript_dict["rel"] = tag.get("rel", None)
             self.transcriptionList.append(transcript_dict)
-            transcriptionList1 = self.transcriptionList
-            self.podcast_transcript = transcriptionList1
+            self.podcast_transcript = self.transcriptionList
         except AttributeError:
             self.podcast_transcript = None
-    
 
-            
     def set_itunes_season(self, tag):
         """Parses the episode season and sets value"""
         try:
             self.itunes_season = tag.string
             if self.itunes_season == "" or self.itunes_season == None:
-                self.itunes_season = '0'
+                self.itunes_season = "0"
         except AttributeError:
-            self.itunes_season = '0'
+            self.itunes_season = "0"
 
     def set_itunes_episode_type(self, tag):
         """Parses the episode type and sets value"""
@@ -379,23 +409,23 @@ class Item(object):
     def set_itunes_duration(self, tag):
         """Parses duration from itunes tags and sets value"""
         try:
-            #remove milli seconds
-            time_no_mil = tag.string.split('.')
-            t = time_no_mil[0].split(':')
+            # remove milli seconds
+            time_no_mil = tag.string.split(".")
+            t = time_no_mil[0].split(":")
             duration = 0
-            if(len(t) == 3):
-                for i,v in enumerate(t):
-                    if(i  == 0):
+            if len(t) == 3:
+                for i, v in enumerate(t):
+                    if i == 0:
                         duration += int(t[0]) * 3600
-                    elif(i  == 1):
+                    elif i == 1:
                         duration += int(t[1]) * 60
                     else:
                         duration += int(t[2])
                 self.itunes_duration = duration
 
-            elif(len(t) == 2):
-                for i,v in enumerate(t):
-                    if(i  == 0):
+            elif len(t) == 2:
+                for i, v in enumerate(t):
+                    if i == 0:
                         duration += int(t[0]) * 60
                     else:
                         duration += int(t[1])
@@ -404,9 +434,6 @@ class Item(object):
             else:
                 self.itunes_duration = tag.string
 
-
-
-
         except AttributeError:
             self.itunes_duration = None
 
@@ -414,9 +441,17 @@ class Item(object):
         """Parses explicit from itunes item tags and sets value"""
         try:
             self.itunes_explicit = tag.string
-            if(self.itunes_explicit.lower() == 'no' or self.itunes_explicit.lower() == 'false' or self.itunes_explicit.lower() == 'clean'):
+            if (
+                self.itunes_explicit.lower() == "no"
+                or self.itunes_explicit.lower() == "false"
+                or self.itunes_explicit.lower() == "clean"
+            ):
                 self.itunes_explicit = False
-            elif(self.itunes_explicit.lower() == 'yes' or self.itunes_explicit.lower() == 'true' or  'offensive' in self.itunes_explicit.lower()):
+            elif (
+                self.itunes_explicit.lower() == "yes"
+                or self.itunes_explicit.lower() == "true"
+                or "offensive" in self.itunes_explicit.lower()
+            ):
                 self.itunes_explicit = True
             else:
                 self.itunes_explicit = None
@@ -427,7 +462,7 @@ class Item(object):
     def set_itunes_image(self, tag):
         """Parses itunes item images and set url as value"""
         try:
-            self.itunes_image = tag.get('href')
+            self.itunes_image = tag.get("href")
         except AttributeError:
             self.itunes_image = None
 
@@ -456,7 +491,7 @@ class Item(object):
     def set_interactive(self, tag):
         """Parses author and set value."""
         try:
-            self.interactive = (tag.string.lower() == "yes")
+            self.interactive = tag.string.lower() == "yes"
             self.is_interactive = self.interactive
         except AttributeError:
             self.interactive = False
