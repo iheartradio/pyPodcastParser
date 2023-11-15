@@ -500,7 +500,7 @@ class TestItunesEpisodes(unittest.TestCase):
         self.assertEqual(self.podcast.items[2].published_date, "2022-05-30 00:05:03")
 
         current_time = datetime.datetime.now(pytz.timezone("US/Eastern")).strftime(
-            "%Y-%m-%d %H:%M"
+            "%Y-%m-%d %H:%M:%S"
         )
         self.assertEqual(self.podcast.items[3].published_date, current_time)
         self.assertEqual(self.podcast.items[4].published_date, "2023-05-22 00:00:00")
