@@ -336,7 +336,7 @@ class Item(object):
         except Exception:
             self.published_date = datetime.datetime.now(
                 pytz.timezone("US/Eastern")
-            ).strftime("%Y-%m-%d %H:%M")
+            ).strftime("%Y-%m-%d %H:%M:%S")
 
     def set_title(self, tag):
         """Parses title and set value."""
