@@ -1,4 +1,4 @@
-name: py-podcast-parser-ci
+name: pypodcastparser-ihr-ci
 
 on:
   push:
@@ -49,3 +49,18 @@ jobs:
         env:
           CODEARTIFACT_AUTH_TOKEN: $CODEARTIFACT_AUTH_TOKEN
 
+      - name: Deploy to CodeArtifact
+        run: |
+          export TWINE_USERNAME=aws
+          export TWINE_PASSWORD=$(aws codeartifact get-authorization-token --domain content-platform --domain-owner 827541288795 --region us-east-1 --query authorizationToken --output text)
+          export TWINE_REPOSITORY_URL=$(aws codeartifact get-repository-endpoint --domain content-platform --domain-owner 827541288795 --repository content-platform --region us-east-1 --format pypi --query repositoryEndpoint --output text)
+          export BRANCH_NAME=$(echo $GITHUB_REF | sed 's/refs\/heads\///')  
+          CURRENT_VERSION=$(git describe --abbrev=0 --tags)
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          pip install -r requirements-ci.txt
+          if [ "$BRANCH_NAME" = "master" ]; then
+            VERSION=$CURRENT_VERSION python setup.py sdist bdist_wheel
+          else
+            VERSION=$CURRENT_VERSION.dev.$COMMIT_COUNT python setup.py sdist bdist_wheel
+          fi
+          twine upload --verbose --repository pypodcastparser-ihr dist/*
