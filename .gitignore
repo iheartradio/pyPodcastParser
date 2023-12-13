@@ -59,5 +59,4 @@ docs/_build/
 target/
 
 .idea
-.python-version
 pypodcastparser/pyPodcastParser.code-workspace

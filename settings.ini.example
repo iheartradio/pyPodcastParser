@@ -4,8 +4,6 @@ DB_NAME=name
 DB_PASSWORD=pass
 DB_USER=user
 
-BROADCASTER_SCAN_FREQUENCY_MAP_HOURLY={"default": 12}
-BROADCASTER_SCAN_FREQUENCY_MAP_MINUTES={"default": 60}
 
 AMP_URL=https://bar.com
 ING_TALK_BASE_URI=https://foo.com
