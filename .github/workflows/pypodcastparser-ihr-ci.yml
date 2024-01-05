@@ -28,7 +28,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::827541288795:role/content-github-actions-nonprod
+          role-to-assume: arn:aws:iam::219619990026:role/content-github-actions-role
           aws-region: us-east-1
           role-duration-seconds: 1200
 
@@ -44,7 +44,7 @@ jobs:
       - name: Tox
         run: |
           cp settings.ini.example settings.ini
-          CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain content-platform --domain-owner 827541288795 --query authorizationToken --output text) && pip config set global.extra-index-url https://aws:$CODEARTIFACT_AUTH_TOKEN@content-platform-827541288795.d.codeartifact.us-east-1.amazonaws.com/pypi/content-platform/simple/
+          CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain content-platform --domain-owner 219619990026 --query authorizationToken --output text) && pip config set global.extra-index-url https://aws:$CODEARTIFACT_AUTH_TOKEN@content-platform-219619990026.d.codeartifact.us-east-1.amazonaws.com/pypi/content-platform/simple/
           python -m tox --verbose
         env:
           CODEARTIFACT_AUTH_TOKEN: $CODEARTIFACT_AUTH_TOKEN
@@ -52,8 +52,8 @@ jobs:
       - name: Deploy to CodeArtifact
         run: |
           export TWINE_USERNAME=aws
-          export TWINE_PASSWORD=$(aws codeartifact get-authorization-token --domain content-platform --domain-owner 827541288795 --region us-east-1 --query authorizationToken --output text)
-          export TWINE_REPOSITORY_URL=$(aws codeartifact get-repository-endpoint --domain content-platform --domain-owner 827541288795 --repository content-platform --region us-east-1 --format pypi --query repositoryEndpoint --output text)
+          export TWINE_PASSWORD=$(aws codeartifact get-authorization-token --domain content-platform --domain-owner 219619990026 --region us-east-1 --query authorizationToken --output text)
+          export TWINE_REPOSITORY_URL=$(aws codeartifact get-repository-endpoint --domain content-platform --domain-owner 219619990026 --repository content-platform --region us-east-1 --format pypi --query repositoryEndpoint --output text)
           export BRANCH_NAME=$(echo $GITHUB_REF | sed 's/refs\/heads\///')  
           CURRENT_VERSION=$(git describe --abbrev=0 --tags)
           COMMIT_COUNT=$(git rev-list --count HEAD)
