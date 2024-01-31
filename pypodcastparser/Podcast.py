@@ -228,7 +228,7 @@ class Podcast:
         try:
             self.description = tag.string
         except AttributeError:
-            self.description = None
+            self.description = ''
 
     def set_image(self, tag):
         """Parses image element and set values"""

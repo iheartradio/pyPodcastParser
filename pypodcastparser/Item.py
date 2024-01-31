@@ -201,7 +201,7 @@ class Item(object):
         try:
             self.description = tag.string
         except AttributeError:
-            self.description = None
+            self.description = ''
 
     def set_content_encoded(self, tag):
         """Parses content_encoded and set value."""
