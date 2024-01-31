@@ -1,0 +1,9 @@
+pip-tools
+pretend
+pytest
+black
+pre-commit
+datadiff
+httmock
+pytest-asyncio==0.21.1
+tox==3.25.0
