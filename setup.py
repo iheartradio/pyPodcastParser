@@ -1,17 +1,19 @@
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
+import os
 
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
+released_version = os.environ.get('VERSION')
 
 setup(
     name='pypodcastparser-ihr',
 
-    version='1.9.1',
+    version=released_version,
 
     description='pypodcastparser is a podcast parser.',
     long_description=long_description,

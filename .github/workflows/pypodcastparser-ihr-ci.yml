@@ -1,0 +1,71 @@
+name: pypodcastparser-ihr-ci
+
+on:
+  push:
+    branches-ignore:
+      - "master"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - name: Send GitHub Action trigger data to Slack workflow
+        id: slack
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel: cp-github
+          status: STARTED
+          color: good
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.CONTENT_PLATFORM_SLACK_GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::219619990026:role/content-github-actions-role
+          aws-region: us-east-1
+          role-duration-seconds: 1200
+
+      - name: Setting up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Installing Dependencies
+        run: |
+          pip install pip --upgrade
+          pip install tox-gh
+          pip install virtualenv
+      - name: Tox
+        run: |
+          cp settings.ini.example settings.ini
+          CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain content-platform --domain-owner 219619990026 --query authorizationToken --output text) && pip config set global.extra-index-url https://aws:$CODEARTIFACT_AUTH_TOKEN@content-platform-219619990026.d.codeartifact.us-east-1.amazonaws.com/pypi/content-platform/simple/
+          python -m tox --verbose
+        env:
+          CODEARTIFACT_AUTH_TOKEN: $CODEARTIFACT_AUTH_TOKEN
+
+      - name: Deploy to CodeArtifact
+        run: |
+          export TWINE_USERNAME=aws
+          export TWINE_PASSWORD=$(aws codeartifact get-authorization-token --domain content-platform --domain-owner 219619990026 --region us-east-1 --query authorizationToken --output text)
+          export TWINE_REPOSITORY_URL=$(aws codeartifact get-repository-endpoint --domain content-platform --domain-owner 219619990026 --repository content-platform --region us-east-1 --format pypi --query repositoryEndpoint --output text)
+          export BRANCH_NAME=$(echo $GITHUB_REF | sed 's/refs\/heads\///')  
+          CURRENT_VERSION=$(git describe --abbrev=0 --tags)
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          echo  $CURRENT_VERSION
+          pip install -r requirements-ci.txt
+          if [ "$BRANCH_NAME" = "master" ]; then
+            VERSION=$CURRENT_VERSION python setup.py sdist bdist_wheel
+          else
+            VERSION=$CURRENT_VERSION.dev.$COMMIT_COUNT python setup.py sdist bdist_wheel
+          fi
+          twine upload --verbose --repository pypodcastparser-ihr dist/*
+
+
+          
+
