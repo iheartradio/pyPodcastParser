@@ -1,0 +1,9 @@
+[settings]
+DB_HOST=host
+DB_NAME=name
+DB_PASSWORD=pass
+DB_USER=user
+
+
+AMP_URL=https://bar.com
+ING_TALK_BASE_URI=https://foo.com

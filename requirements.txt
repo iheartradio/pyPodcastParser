@@ -32,3 +32,4 @@ wheel==0.24.0
     # via -r requirements.in
 zipp==3.1.0
     # via importlib-metadata
+tox==3.25.0
