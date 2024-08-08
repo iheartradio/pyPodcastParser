@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup, Tag
 import datetime
 import email.utils
 from pypodcastparser.Item import Item
+from pypodcastparser.Error import TagError
 
 
 class InvalidPodcastFeed(ValueError):
@@ -125,8 +126,10 @@ class Podcast:
         try:
             channel = self.soup.rss.channel
             channel_items = channel.children
-        except AttributeError:
-            raise InvalidPodcastFeed("Invalid Podcast Feed")
+        except TagError as e:
+            raise e
+        except AttributeError as e:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed {e}")
 
         # Populate attributes based on feed content
         for c in channel_items:
