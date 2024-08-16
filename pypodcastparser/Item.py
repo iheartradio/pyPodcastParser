@@ -7,6 +7,8 @@ import re
 import pytz
 import logging
 
+from pypodcastparser.Podcast import InvalidPodcastFeed
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -155,6 +157,8 @@ class Item(object):
             self.time_published = email.utils.mktime_tz(time_tuple)
         except (TypeError, ValueError, IndexError):
             self.time_published = None
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level pubDate: {self.published_date_string}, could not be parsed")
 
     def set_dates_published(self):
         if self.time_published is None:
@@ -164,6 +168,8 @@ class Item(object):
             self.date_time = datetime.date.fromtimestamp(self.time_published)
         except ValueError:
             self.date_time = None
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level pubDate: {self.published_date_string}, could not be parsed")
 
     def to_dict(self):
         item = {}
@@ -195,6 +201,8 @@ class Item(object):
             self.author = tag.string
         except AttributeError:
             self.author = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, episode level author could not be parsed")              
 
     def set_description(self, tag):
         """Parses description and set value."""
@@ -202,6 +210,8 @@ class Item(object):
             self.description = tag.string
         except AttributeError:
             self.description = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, episode level description could not be parsed")
 
     def set_content_encoded(self, tag):
         """Parses content_encoded and set value."""
@@ -211,6 +221,8 @@ class Item(object):
                 self.description = self.content_encoded
         except AttributeError:
             self.content_encoded = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, episode level content_encoded could not be parsed")
 
     def set_enclosure(self, tag):
         """Parses enclosure_url, enclosure_type then set values."""
@@ -234,6 +246,8 @@ class Item(object):
             self.guid = tag.string
         except AttributeError:
             self.guid = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, episode level guid could not be parsed")
 
     # TODO convert to one timezone
     def set_published_date(self, tag):
@@ -344,6 +358,8 @@ class Item(object):
             self.title = tag.string
         except AttributeError:
             self.title = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, episode level title could not be parsed")
 
     def set_itunes_author_name(self, tag):
         """Parses author name from itunes tags and sets value"""
@@ -351,6 +367,8 @@ class Item(object):
             self.itunes_author_name = tag.string
         except AttributeError:
             self.itunes_author_name = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, episode level itunes:author could not be parsed")
 
     def set_itunes_episode(self, tag):
         """Parses the episode number and sets value"""
@@ -361,6 +379,8 @@ class Item(object):
                 self.itunes_episode = "0"
         except AttributeError:
             self.itunes_episode = "0"
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:episode: {tag.string}, could not be parsed")
 
     def set_podcast_transcript(self, tag):
         """Parses the episode transcript and sets value
@@ -377,6 +397,8 @@ class Item(object):
             self.podcast_transcript = self.transcriptionList
         except AttributeError:
             self.podcast_transcript = None
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode transcription could not be parsed")
 
     def set_itunes_season(self, tag):
         """Parses the episode season and sets value"""
@@ -394,6 +416,8 @@ class Item(object):
             self.itunes_episode_type = self.itunes_episode_type.lower()
         except AttributeError:
             self.itunes_episode_type = None
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:episodeType: {tag.string}, could not be parsed")
 
     def set_itunes_block(self, tag):
         """Check and see if item is blocked from iTunes and sets value"""
@@ -405,6 +429,8 @@ class Item(object):
             self.itunes_block = True
         else:
             self.itunes_block = False
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:block: {tag.string}, could not be parsed")
 
     def set_itunes_duration(self, tag):
         """Parses duration from itunes tags and sets value"""
@@ -436,6 +462,8 @@ class Item(object):
 
         except AttributeError:
             self.itunes_duration = None
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:duration: {tag.string}, could not be parsed")
 
     def set_itunes_explicit(self, tag):
         """Parses explicit from itunes item tags and sets value"""
@@ -458,6 +486,8 @@ class Item(object):
 
         except AttributeError:
             self.itunes_explicit = None
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:explicit could not be parsed")
 
     def set_itunes_image(self, tag):
         """Parses itunes item images and set url as value"""
@@ -465,6 +495,8 @@ class Item(object):
             self.itunes_image = tag.get("href")
         except AttributeError:
             self.itunes_image = None
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:image could not be parsed")
 
     def set_itunes_order(self, tag):
         """Parses episode order and set url as value"""
@@ -473,6 +505,8 @@ class Item(object):
             self.itunes_order = self.itunes_order.lower()
         except AttributeError:
             self.itunes_order = None
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:order could not be parsed")
 
     def set_itunes_subtitle(self, tag):
         """Parses subtitle from itunes tags and sets value"""
@@ -480,6 +514,8 @@ class Item(object):
             self.itunes_subtitle = tag.string
         except AttributeError:
             self.itunes_subtitle = None
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:subtitle could not be parsed")
 
     def set_itunes_summary(self, tag):
         """Parses summary from itunes tags and sets value"""
@@ -487,6 +523,7 @@ class Item(object):
             self.itunes_summary = tag.string
         except AttributeError:
             self.itunes_summary = None
+        raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:summary could not be parsed")
 
     def set_interactive(self, tag):
         """Parses author and set value."""
@@ -496,3 +533,5 @@ class Item(object):
         except AttributeError:
             self.interactive = False
             self.is_interactive = self.interactive
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level ihr:interactive: {tag.string}, could not be parsed")

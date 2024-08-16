@@ -160,6 +160,8 @@ class Podcast:
             self.time_published = email.utils.mktime_tz(time_tuple)
         except (TypeError, ValueError, IndexError):
             self.time_published = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level pubDate could not be parsed")
 
     def set_dates_published(self):
         if self.time_published is None:
@@ -169,6 +171,8 @@ class Podcast:
                 self.date_time = datetime.date.fromtimestamp(self.time_published)
             except ValueError:
                 self.date_time = None
+            except Exception:
+                raise InvalidPodcastFeed("Invalid Podcast Feed, show level pubDate could not be parsed")       
 
     def to_dict(self):
         """Create dict representation of Podcast object."""
@@ -222,6 +226,8 @@ class Podcast:
             self.copyright = tag.string
         except AttributeError:
             self.copyright = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level copyright could not be parsed")
 
     def set_description(self, tag):
         """Parses description and sets value"""
@@ -229,6 +235,8 @@ class Podcast:
             self.description = tag.string
         except AttributeError:
             self.description = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level description could not be parsed")
 
     def set_image(self, tag):
         """Parses image element and set values"""
@@ -236,6 +244,8 @@ class Podcast:
             self.image_url = tag.find("url", recursive=False).string
         except AttributeError:
             self.image_url = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level image could not be parsed")
 
     def set_itunes_author_name(self, tag):
         """Parses author name from itunes tags and sets value"""
@@ -243,6 +253,8 @@ class Podcast:
             self.itunes_author_name = tag.string
         except AttributeError:
             self.itunes_author_name = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level itunes:author could not be parsed")
 
     def set_itunes_type(self, tag):
         """Parses the type of show and sets value"""
@@ -251,6 +263,8 @@ class Podcast:
             self.itunes_type = self.itunes_type.lower()
         except AttributeError:
             self.itunes_type = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level itunes:type could not be parsed")
 
     def set_itunes_block(self, tag):
         """Check and see if podcast is blocked from iTunes and sets value"""
@@ -258,6 +272,8 @@ class Podcast:
             block = tag.string.lower()
         except AttributeError:
             block = ""
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level itunes:block could not be parsed")
         if block == "yes":
             self.itunes_block = True
         else:
@@ -286,6 +302,8 @@ class Podcast:
             self.itunes_complete = tag.string.lower()
         except AttributeError:
             self.itunes_complete = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level itunes:complete could not be parsed")
 
     def set_itunes_explicit(self, tag):
         """Parses explicit from itunes tags and sets value"""
@@ -293,6 +311,8 @@ class Podcast:
             self.itunes_explicit = tag.string.lower()
         except AttributeError:
             self.itunes_explicit = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level itunes:explicit could not be parsed")
 
     def set_itunes_image(self, tag):
         """Parses itunes images and set url as value"""
@@ -300,6 +320,8 @@ class Podcast:
             self.itunes_image = tag.get("href")
         except AttributeError:
             self.itunes_image = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level itunes:image could not be parsed")
 
     def set_itunes_keywords(self, tag):
         """Parses and adds itunes keywords"""
@@ -319,6 +341,8 @@ class Podcast:
             self.itunes_keywords = unique_keywords_list
         except AttributeError:
             self.itunes_keywords = []
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level itunes:keywords could not be parsed")
 
     def set_itunes_new_feed_url(self, tag):
         """Parses new feed url from itunes tags and sets value"""
@@ -326,6 +350,8 @@ class Podcast:
             self.itunes_new_feed_url = tag.string
         except AttributeError:
             self.itunes_new_feed_url = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level itunes:new-feed-url could not be parsed")
 
     def set_language(self, tag):
         """Parses feed language and set value"""
@@ -333,6 +359,8 @@ class Podcast:
             self.language = tag.string
         except AttributeError:
             self.language = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level language could not be parsed")
 
     def set_last_build_date(self, tag):
         """Parses last build date and set value"""
@@ -347,6 +375,8 @@ class Podcast:
             self.link = tag.string
         except AttributeError:
             self.link = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level link could not be parsed")
 
     def set_published_date(self, tag):
         """Parses published date and set value"""
@@ -364,6 +394,8 @@ class Podcast:
             )
         except AttributeError:
             self.published_date = None
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, show level pubDate: {tag.string}, could not be parsed")
 
     def set_owner(self, tag):
         """Parses owner name and email then sets value"""
@@ -375,6 +407,8 @@ class Podcast:
             self.owner_email = tag.find("itunes:email", recursive=False).string
         except AttributeError:
             self.owner_email = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level itunes:owner could not be parsed")
 
     def set_subtitle(self, tag):
         """Parses subtitle and sets value"""
@@ -382,6 +416,8 @@ class Podcast:
             self.subtitle = tag.string
         except AttributeError:
             self.subtitle = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level subtitle could not be parsed")
 
     def set_summary(self, tag):
         """Parses summary and set value"""
@@ -389,6 +425,8 @@ class Podcast:
             self.summary = tag.string
         except AttributeError:
             self.summary = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level summary could not be parsed")
 
     def set_title(self, tag):
         """Parses title and set value"""
@@ -396,6 +434,8 @@ class Podcast:
             self.title = tag.string
         except AttributeError:
             self.title = None
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level title could not be parsed")
 
     def set_interactive(self, tag):
         """Parses ihr-interactive and set value"""
@@ -405,3 +445,5 @@ class Podcast:
         except AttributeError:
             self.interactive = False
             self.is_interactive = self.interactive
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, show level ihr:interactive could not be parsed")
