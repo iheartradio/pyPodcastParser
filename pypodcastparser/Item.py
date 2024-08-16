@@ -6,12 +6,9 @@ import email.utils
 import re
 import pytz
 import logging
-from pypodcastparser.Error import TagError
 
 LOGGER = logging.getLogger(__name__)
 
-
-    
 
 pytz_timezon_list = [tz for tz in pytz.all_timezones]
 common_timezones = {
@@ -132,23 +129,20 @@ class Item(object):
 
         # Populate attributes based on feed content
         for c in self.soup.children:
+            if not isinstance(c, Tag):
+                continue
             try:
-                if not isinstance(c, Tag):
-                    continue
-                try:
-                    # Using get instead of pop since there can be multiple transcript tags (meaning we don't want to get rid of method after use)
-                    if c.name == "transcript":
-                        tag_method = tag_methods.get((c.prefix, c.name))
-                    else:
-                        # Pop method to skip duplicated tag on invalid feeds
-                        tag_method = tag_methods.pop((c.prefix, c.name))
-                except (AttributeError, KeyError):
-                    continue
+                # Using get instead of pop since there can be multiple transcript tags (meaning we don't want to get rid of method after use)
+                if c.name == "transcript":
+                    tag_method = tag_methods.get((c.prefix, c.name))
+                else:
+                    # Pop method to skip duplicated tag on invalid feeds
+                    tag_method = tag_methods.pop((c.prefix, c.name))
+            except (AttributeError, KeyError):
+                continue
 
-                tag_method(c)
-            except Exception as e:
-                raise TagError(c.name, c.string)
-                
+            tag_method(c)
+
         self.set_time_published()
         self.set_dates_published()
 

@@ -2,10 +2,8 @@
 import datetime
 import os
 import unittest
-from bs4 import BeautifulSoup
 import pytz
-from pypodcastparser import Item, Podcast
-from pypodcastparser.Error import TagError
+from pypodcastparser import Podcast
 
 # py.test test_pypodcastparser.py
 
@@ -617,49 +615,6 @@ class TestItunesEpisodeParsingWithTranscription(unittest.TestCase):
             self.podcast.items[1].podcast_transcript[1].get("language"), "US-en"
         )
 
-
-class TestItemInit(unittest.TestCase):
-
-    def test_tag_error_raised(self):
-        # Create a mock RSS feed with an invalid tag
-        invalid_rss = """
-        <rss>
-            <channel>
-                <item>
-                    <invalidTag/></invalidTag>
-                </item>
-            </channel>
-        </rss>
-        """
-        soup = BeautifulSoup(invalid_rss, 'xml')
-
-        # Assert that TagError is raised with the correct name and content
-        with self.assertRaises(TagError) as context:
-            Item.Item(soup)
-
-        self.assertEqual(context.exception.name, 'invalidTag')
-        self.assertEqual(context.exception.content, 'Invalid Content')
-
-
-class TestPodcastInit(unittest.TestCase):
-
-    def test_tag_error_raised_on_podcast_init(self):
-        # Create a mock RSS feed with an invalid tag
-        invalid_rss = """
-        <rss>
-            <channel>
-                <invalidTag>Invalid Content</invalidTag>
-            </channel>
-        </rss>
-        """
-        soup = BeautifulSoup(invalid_rss, 'xml')
-
-        # Assert that TagError is raised during initialization
-        with self.assertRaises(TagError) as context:
-            Podcast.Podcast(soup)
-
-        self.assertEqual(context.exception.name, 'invalidTag')
-        self.assertEqual(context.exception.content, 'Invalid Content')
 
 if __name__ == "__main__":
     unittest.main()
