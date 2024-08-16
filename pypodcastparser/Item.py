@@ -7,7 +7,8 @@ import re
 import pytz
 import logging
 
-from pypodcastparser.Podcast import InvalidPodcastFeed
+from pypodcastparser.Error import InvalidPodcastFeed
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -425,12 +426,12 @@ class Item(object):
             block = tag.string.lower()
         except AttributeError:
             block = ""
+        except Exception:
+            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:block: {tag.string}, could not be parsed")
         if block == "yes":
             self.itunes_block = True
         else:
             self.itunes_block = False
-        except Exception:
-            raise InvalidPodcastFeed(f"Invalid Podcast Feed, episode level itunes:block: {tag.string}, could not be parsed")
 
     def set_itunes_duration(self, tag):
         """Parses duration from itunes tags and sets value"""

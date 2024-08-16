@@ -3,10 +3,7 @@ from bs4 import BeautifulSoup, Tag
 import datetime
 import email.utils
 from pypodcastparser.Item import Item
-
-
-class InvalidPodcastFeed(ValueError):
-    pass
+from pypodcastparser.Error import InvalidPodcastFeed
 
 
 class Podcast:

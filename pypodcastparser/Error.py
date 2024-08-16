@@ -1,0 +1,2 @@
+class InvalidPodcastFeed(ValueError):
+    pass
