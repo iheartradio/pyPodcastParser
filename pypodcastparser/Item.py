@@ -203,7 +203,7 @@ class Item(object):
         except AttributeError:
             self.author = None
         except Exception:
-            raise InvalidPodcastFeed("Invalid Podcast Feed, episode level author could not be parsed")              
+            raise InvalidPodcastFeed("Invalid Podcast Feed, episode level author could not be parsed")
 
     def set_description(self, tag):
         """Parses description and set value."""
@@ -524,7 +524,8 @@ class Item(object):
             self.itunes_summary = tag.string
         except AttributeError:
             self.itunes_summary = None
-        raise InvalidPodcastFeed("Invalid Podcast Feed, episode level itunes:summary could not be parsed")
+        except Exception:
+            raise InvalidPodcastFeed("Invalid Podcast Feed, episode level itunes:summary could not be parsed")
 
     def set_interactive(self, tag):
         """Parses author and set value."""

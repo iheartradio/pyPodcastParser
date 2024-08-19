@@ -169,7 +169,7 @@ class Podcast:
             except ValueError:
                 self.date_time = None
             except Exception:
-                raise InvalidPodcastFeed("Invalid Podcast Feed, show level pubDate could not be parsed")       
+                raise InvalidPodcastFeed("Invalid Podcast Feed, show level pubDate could not be parsed")
 
     def to_dict(self):
         """Create dict representation of Podcast object."""
