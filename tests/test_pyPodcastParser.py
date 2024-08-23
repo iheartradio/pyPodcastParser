@@ -616,5 +616,34 @@ class TestItunesEpisodeParsingWithTranscription(unittest.TestCase):
         )
 
 
+class TestInvalidPodcastFeed(unittest.TestCase):
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        test_feeds_dir = os.path.join(test_dir, "test_feeds")
+        invalid_podcast_path = os.path.join(test_feeds_dir, "invalid_show_dates.rss")
+        invalid_podcast_file = open(invalid_podcast_path, "rb")
+        self.invalid_podcast = invalid_podcast_file.read()
+
+    def test_invalid_podcast_feed(self):
+        with self.assertRaises(Podcast.InvalidPodcastFeed) as context:
+            Podcast.Podcast(self.invalid_podcast)
+        self.assertTrue('Invalid Podcast Feed, show level pubDate: "2022-2022-2202-020202", could not be parsed' == str(context.exception))
+
+
+class TestInvalidEpisodeDates(unittest.TestCase):
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        test_feeds_dir = os.path.join(test_dir, "test_feeds")
+        invalid_episode_path = os.path.join(test_feeds_dir, "invalid_episode_dates.rss")
+        with open(invalid_episode_path, "rb") as invalid_episode_file:
+            self.invalid_episode = invalid_episode_file.read()
+
+    def test_invalid_episode_dates(self):
+        with self.assertRaises(Podcast.InvalidPodcastFeed) as context:
+            Podcast.Podcast(self.invalid_episode)
+        self.assertTrue('Invalid Podcast Feed, show level pubDate: "Mon, 24 Mar 2008 23:30:07 GMT", could not be parsed' == str(context.exception))
+
+
+
 if __name__ == "__main__":
     unittest.main()
