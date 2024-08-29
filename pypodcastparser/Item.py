@@ -268,6 +268,9 @@ class Item(object):
             elif "+1000" in self.published_date:
                 published_date_timezone = "AEST"
                 deconstructed_date.pop()
+            elif "+1200" in self.published_date:
+                published_date_timezone = "NZST"
+                deconstructed_date.pop()
             else:
                 published_date_timezone = "EST"
 
