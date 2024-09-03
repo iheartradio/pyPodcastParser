@@ -13,9 +13,32 @@ from pypodcastparser.Error import InvalidPodcastFeed
 LOGGER = logging.getLogger(__name__)
 
 
-pytz_timezon_list = [tz for tz in pytz.all_timezones]
+pytz_timezone_list = [tz for tz in pytz.all_timezones]
+
 common_timezones = {
+    "IDLW": "Pacific/Midway",
+    "NUT": "Pacific/Niue",
+    "MART": "Pacific/Marquesas",
+    "AKST": "America/Anchorage",
+    "MST": "America/Denver",
+    "EST": "America/New_York",
+    "VET": "America/Caracas",
+    "BRT": "America/Sao_Paulo",
+    "GST": "Asia/Dubai",
+    "AZOT": "Atlantic/Azores",
+    "MSK": "Europe/Moscow",
+    "PKT": "Asia/Karachi",
+    "NPT": "Asia/Kathmandu",
+    "MMT": "Asia/Rangoon",
+    "ICT": "Asia/Bangkok",
+    "AWST": "Australia/Perth",
+    "ACWST": "Australia/Eucla",
     "GMT": "GMT",
+    "ACST": "Australia/Adelaide",
+    "AEDT": "Australia/Sydney",
+    "CHAST": "Pacific/Chatham",
+    "NZDT": "Pacific/Auckland",
+    "LINT": "Pacific/Kiritimati",
     "UTC": "UTC",
     "CET": "Europe/Berlin",
     "EET": "Africa/Cairo",
@@ -33,6 +56,7 @@ common_timezones = {
     "CAT": "Africa/Maputo",
     "AEST": "Australia/Sydney",
     "PDT": "America/Los_Angeles",
+    "NZST": "Pacific/Auckland",
 }
 
 
@@ -386,7 +410,7 @@ class Item(object):
                 )
 
             if published_date_timezone not in ["ET", "EST", "EDT"]:
-                if published_date_timezone in pytz_timezon_list:
+                if published_date_timezone in pytz_timezone_list:
                     current_timezone = pytz.timezone(published_date_timezone)
                 else:
                     current_timezone = pytz.timezone(
