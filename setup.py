@@ -8,7 +8,7 @@ here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
 with open(path.join(here, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
-released_version = os.environ.get("VERSION")
+released_version = "1.9.2dev171"
 
 setup(
     name="pypodcastparser-ihr",
