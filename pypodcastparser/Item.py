@@ -297,6 +297,7 @@ class Item(object):
             if len(deconstructed_date) < 4:
                 raise AttributeError
 
+            # Map of timezone offsets to timezone abbreviations
             offset_map = {
                 "-1200": "IDLW",
                 "-1100": "NUT",
