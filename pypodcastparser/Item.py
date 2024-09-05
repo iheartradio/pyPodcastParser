@@ -59,6 +59,46 @@ common_timezones = {
     "NZST": "Pacific/Auckland",
 }
 
+# Map of timezone offsets to timezone abbreviations
+offset_map = {
+    "-1200": "IDLW",
+    "-1100": "NUT",
+    "-1000": "HST",
+    "-0930": "MART",
+    "-0900": "AKST",
+    "-0800": "PST",
+    "-0700": "MST",
+    "-0600": "CST",
+    "-0500": "EST",
+    "-0430": "VET",
+    "-0400": "AST",
+    "-0330": "NST",
+    "-0300": "BRT",
+    "-0200": "GST",
+    "-0100": "AZOT",
+    "-0000": "GMT",
+    "+0100": "CET",
+    "+0200": "EET",
+    "+0300": "MSK",
+    "+0400": "GST",
+    "+0500": "PKT",
+    "+0545": "NPT",
+    "+0600": "BST",
+    "+0630": "MMT",
+    "+0700": "ICT",
+    "+0800": "AWST",
+    "+0845": "ACWST",
+    "+0900": "JST",
+    "+0930": "ACST",
+    "+1000": "AEST",
+    "+1030": "ACST",
+    "+1100": "AEDT",
+    "+1200": "NZST",
+    "+1245": "CHAST",
+    "+1300": "NZDT",
+    "+1400": "LINT",
+}
+
 
 class Item(object):
     """Parses an xml rss feed
@@ -296,46 +336,6 @@ class Item(object):
             deconstructed_date = self.published_date_string.split(" ")
             if len(deconstructed_date) < 4:
                 raise AttributeError
-
-            # Map of timezone offsets to timezone abbreviations
-            offset_map = {
-                "-1200": "IDLW",
-                "-1100": "NUT",
-                "-1000": "HST",
-                "-0930": "MART",
-                "-0900": "AKST",
-                "-0800": "PST",
-                "-0700": "MST",
-                "-0600": "CST",
-                "-0500": "EST",
-                "-0430": "VET",
-                "-0400": "AST",
-                "-0330": "NST",
-                "-0300": "BRT",
-                "-0200": "GST",
-                "-0100": "AZOT",
-                "-0000": "GMT",
-                "+0100": "CET",
-                "+0200": "EET",
-                "+0300": "MSK",
-                "+0400": "GST",
-                "+0500": "PKT",
-                "+0545": "NPT",
-                "+0600": "BST",
-                "+0630": "MMT",
-                "+0700": "ICT",
-                "+0800": "AWST",
-                "+0845": "ACWST",
-                "+0900": "JST",
-                "+0930": "ACST",
-                "+1000": "AEST",
-                "+1030": "ACST",
-                "+1100": "AEDT",
-                "+1200": "NZST",
-                "+1245": "CHAST",
-                "+1300": "NZDT",
-                "+1400": "LINT",
-            }
 
             published_date_timezone = ""
             # Check for timezone abbreviation
