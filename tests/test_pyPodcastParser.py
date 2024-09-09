@@ -508,7 +508,8 @@ class TestItunesEpisodes(unittest.TestCase):
             self.podcast.items[5].published_date, "2023-07-06 04:00:00"
         )  # PDT TO EST
 
-        self.assertEqual(self.podcast.items[6].published_date, "2023-12-22 01:00:00")
+        self.assertEqual(self.podcast.items[6].published_date, "2023-12-22 17:00:00")
+        self.assertEqual(self.podcast.items[7].published_date, "2023-12-21 20:00:00")
 
     def test_episode_meta_data_external_image_url(self):
         self.assertEqual(
