@@ -1,0 +1,19 @@
+repos:
+-   repo: https://github.com/ambv/black
+    rev: 22.3.0
+    hooks:
+    -   id: black
+        name: black
+        entry: black
+        require_serial: true
+        language: python
+        language_version: python3
+        types_or: [cython, pyi, python]
+        minimum_pre_commit_version: '2.9.2'
+        # additional_dependencies: ['black==22.3.0']
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.0.0
+    hooks:
+    -   id: flake8
+        exclude: ^test
+        args: ['--ignore=F841,E722,F821,E711,E231,W503,E501,F401']
