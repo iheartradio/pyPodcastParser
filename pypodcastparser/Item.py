@@ -16,29 +16,7 @@ LOGGER = logging.getLogger(__name__)
 pytz_timezone_list = [tz for tz in pytz.all_timezones]
 
 common_timezones = {
-    "IDLW": "Pacific/Midway",
-    "NUT": "Pacific/Niue",
-    "MART": "Pacific/Marquesas",
-    "AKST": "America/Anchorage",
-    "MST": "America/Denver",
-    "EST": "America/New_York",
-    "VET": "America/Caracas",
-    "BRT": "America/Sao_Paulo",
-    "GST": "Asia/Dubai",
-    "AZOT": "Atlantic/Azores",
-    "MSK": "Europe/Moscow",
-    "PKT": "Asia/Karachi",
-    "NPT": "Asia/Kathmandu",
-    "MMT": "Asia/Rangoon",
-    "ICT": "Asia/Bangkok",
-    "AWST": "Australia/Perth",
-    "ACWST": "Australia/Eucla",
     "GMT": "GMT",
-    "ACST": "Australia/Adelaide",
-    "AEDT": "Australia/Sydney",
-    "CHAST": "Pacific/Chatham",
-    "NZDT": "Pacific/Auckland",
-    "LINT": "Pacific/Kiritimati",
     "UTC": "UTC",
     "CET": "Europe/Berlin",
     "EET": "Africa/Cairo",
@@ -57,46 +35,6 @@ common_timezones = {
     "AEST": "Australia/Sydney",
     "PDT": "America/Los_Angeles",
     "NZST": "Pacific/Auckland",
-}
-
-# Map of timezone offsets to timezone abbreviations
-offset_map = {
-    "-1200": "IDLW",
-    "-1100": "NUT",
-    "-1000": "HST",
-    "-0930": "MART",
-    "-0900": "AKST",
-    "-0800": "PST",
-    "-0700": "MST",
-    "-0600": "CST",
-    "-0500": "EST",
-    "-0430": "VET",
-    "-0400": "AST",
-    "-0330": "NST",
-    "-0300": "BRT",
-    "-0200": "GST",
-    "-0100": "AZOT",
-    "-0000": "GMT",
-    "+0100": "CET",
-    "+0200": "EET",
-    "+0300": "MSK",
-    "+0400": "GST",
-    "+0500": "PKT",
-    "+0545": "NPT",
-    "+0600": "BST",
-    "+0630": "MMT",
-    "+0700": "ICT",
-    "+0800": "AWST",
-    "+0845": "ACWST",
-    "+0900": "JST",
-    "+0930": "ACST",
-    "+1000": "AEST",
-    "+1030": "ACST",
-    "+1100": "AEDT",
-    "+1200": "NZST",
-    "+1245": "CHAST",
-    "+1300": "NZDT",
-    "+1400": "LINT",
 }
 
 
@@ -342,18 +280,17 @@ class Item(object):
             if re.match("^[a-zA-Z]{3}$", deconstructed_date[-1]):
                 published_date_timezone = deconstructed_date[-1]
                 deconstructed_date.pop()
+            elif "+1000" in self.published_date:
+                published_date_timezone = "AEST"
+                deconstructed_date.pop()
+            elif "+1200" in self.published_date:
+                published_date_timezone = "NZST"
+                deconstructed_date.pop
             else:
-                # Check for specific timezone offsets
-                for offset, tz in offset_map.items():
-                    if offset in self.published_date:
-                        published_date_timezone = tz
-                        deconstructed_date.pop()
-                        break
-            if not published_date_timezone:
                 published_date_timezone = "EST"
 
             regex_array = [
-                r"^[a-zA-Z]{3},$",  # Raw string, so \ is treated literally
+                r"^[a-zA-Z]{3},$",
                 r"^\d{1,2}$",
                 r"^[a-zA-Z]{3}$",
                 r"^\d{4}$",
