@@ -100,7 +100,6 @@ offset_map = {
     "+1400": "LINT",
 }
 
-
 class Item(object):
     """Parses an xml rss feed
 
