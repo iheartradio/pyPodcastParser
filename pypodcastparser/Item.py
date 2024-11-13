@@ -111,7 +111,7 @@ class Item(object):
         soup (bs4.BeautifulSoup): BeautifulSoup object representing a rss item
 
     Note:
-        All attributes with empty or nonexistent element
+        All attributes with empty or non-existent element
         will have a value of None
 
     Attributes:
