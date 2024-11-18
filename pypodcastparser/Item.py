@@ -354,7 +354,7 @@ class Item(object):
                 published_date_timezone = "EST"
 
             regex_array = [
-                r"^[a-zA-Z]{3},$",  # Raw string, so \ is treated literally
+                r"^[a-zA-Z]{3},$",  # Raw string, so '\' is treated literally
                 r"^\d{1,2}$",
                 r"^[a-zA-Z]{3}$",
                 r"^\d{4}$",
