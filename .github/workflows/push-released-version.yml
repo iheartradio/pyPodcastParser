@@ -1,0 +1,45 @@
+name: publish-release-version
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::219619990026:role/content-github-actions-role
+          aws-region: us-east-1
+          role-duration-seconds: 1200
+
+      - name: Setting up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Installing Dependencies
+        run: |
+          pip install pip --upgrade
+          pip install virtualenv
+
+      - name: Deploy to CodeArtifact
+        run: |
+          export TWINE_USERNAME=aws
+          export TWINE_PASSWORD=$(aws codeartifact get-authorization-token --domain content-platform --domain-owner 219619990026 --region us-east-1 --query authorizationToken --output text)
+          export TWINE_REPOSITORY_URL=$(aws codeartifact get-repository-endpoint --domain content-platform --domain-owner 219619990026 --repository content-platform --region us-east-1 --format pypi --query repositoryEndpoint --output text)
+          export BRANCH_NAME=$(echo $GITHUB_REF | sed 's/refs\/heads\///')  
+          CURRENT_VERSION=$(git describe --abbrev=0 --tags)
+          echo "Current released version is: $CURRENT_VERSION"
+          pip install -r requirements-ci.txt
+          VERSION=$CURRENT_VERSION python setup.py sdist bdist_wheel
+          twine upload --verbose --repository pypodcastparser-ihr dist/*
