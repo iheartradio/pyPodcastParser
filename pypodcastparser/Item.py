@@ -77,6 +77,7 @@ offset_map = {
     "-0200": "GST",
     "-0100": "AZOT",
     "-0000": "GMT",
+    "+0000": "GMT",
     "+0100": "CET",
     "+0200": "EET",
     "+0300": "MSK",
@@ -110,7 +111,7 @@ class Item(object):
         soup (bs4.BeautifulSoup): BeautifulSoup object representing a rss item
 
     Note:
-        All attributes with empty or nonexistent element
+        All attributes with empty or non-existent element
         will have a value of None
 
     Attributes:
