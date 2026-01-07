@@ -652,13 +652,13 @@ class Item(object):
 
     def set_alternate_enclosure(self, tag):
         """Parses podcast:alternateEnclosure and its nested podcast:source elements.
-        
+
         The alternateEnclosure element provides alternative media versions with different
         formats, quality levels, and transport methods (HTTPS, IPFS, torrents, etc.).
         """
         try:
             enclosure_dict = {}
-            
+
             # Parse main alternateEnclosure attributes
             enclosure_dict["type"] = tag.get("type", None)
             enclosure_dict["length"] = tag.get("length", None)
@@ -667,33 +667,33 @@ class Item(object):
                     enclosure_dict["length"] = int(enclosure_dict["length"])
                 except (ValueError, TypeError):
                     pass
-            
+
             enclosure_dict["bitrate"] = tag.get("bitrate", None)
             if enclosure_dict["bitrate"]:
                 try:
                     enclosure_dict["bitrate"] = float(enclosure_dict["bitrate"])
                 except (ValueError, TypeError):
                     pass
-            
+
             enclosure_dict["height"] = tag.get("height", None)
             if enclosure_dict["height"]:
                 try:
                     enclosure_dict["height"] = int(enclosure_dict["height"])
                 except (ValueError, TypeError):
                     pass
-            
+
             enclosure_dict["lang"] = tag.get("lang", None)
             enclosure_dict["title"] = tag.get("title", None)
             enclosure_dict["rel"] = tag.get("rel", None)
             enclosure_dict["codecs"] = tag.get("codecs", None)
-            
+
             # Parse default attribute as boolean
             default_value = tag.get("default", None)
             if default_value:
                 enclosure_dict["default"] = default_value.lower() in ["true", "1", "yes"]
             else:
                 enclosure_dict["default"] = None
-            
+
             # Parse nested podcast:source elements
             sources = []
             for source_tag in tag.find_all("source", recursive=False):
@@ -702,11 +702,11 @@ class Item(object):
                     source_dict["uri"] = source_tag.get("uri", None)
                     source_dict["contentType"] = source_tag.get("contentType", None)
                     sources.append(source_dict)
-            
+
             enclosure_dict["sources"] = sources
-            
+
             self.alternate_enclosures.append(enclosure_dict)
-            
+
         except AttributeError:
             # If there's an issue parsing, we don't add it to the list
             pass
