@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" 
+     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+     xmlns:podcast="https://podcastindex.org/namespace/1.0">
+    <channel>
+        <title>Alternate Enclosure Test Podcast</title>
+        <description>Test podcast for alternateEnclosure parsing</description>
+        <link>https://example.com</link>
+        <language>en-us</language>
+        <itunes:author>Test Author</itunes:author>
+        <itunes:explicit>no</itunes:explicit>
+        
+        <item>
+            <title>Episode with Multiple Alternate Enclosures</title>
+            <description>This episode has multiple media versions</description>
+            <pubDate>Tue, 07 Jan 2025 10:00:00 EST</pubDate>
+            <guid>episode-001</guid>
+            
+            <!-- Standard enclosure (required for backward compatibility) -->
+            <enclosure url="https://example.com/episode001.mp3" length="43200000" type="audio/mpeg" />
+            
+            <!-- Same content via multiple transports -->
+            <podcast:alternateEnclosure 
+                type="audio/mpeg" 
+                length="43200000" 
+                bitrate="128000" 
+                default="true" 
+                title="Standard MP3">
+                <podcast:source uri="https://example.com/episode001.mp3" />
+                <podcast:source uri="ipfs://QmdwGqd3d2gFPGeJNLLCshdiPert45fMu84552Y4XHTy4y" />
+                <podcast:source uri="https://example.com/episode001.torrent" contentType="application/x-bittorrent" />
+            </podcast:alternateEnclosure>
+            
+            <!-- High quality Opus version -->
+            <podcast:alternateEnclosure 
+                type="audio/opus" 
+                length="32400000" 
+                bitrate="96000" 
+                title="High Quality Opus">
+                <podcast:source uri="https://example.com/episode001.opus" />
+                <podcast:source uri="ipfs://QmHighQualityOpusFile123456789" />
+            </podcast:alternateEnclosure>
+            
+            <!-- Video version at 1080p -->
+            <podcast:alternateEnclosure 
+                type="video/mp4" 
+                length="10562995" 
+                bitrate="681483.55" 
+                height="1080"
+                codecs="avc1.64001f, mp4a.40.2"
+                lang="en">
+                <podcast:source uri="https://example.com/episode001-1080.mp4" />
+                <podcast:source uri="ipfs://QmVideoFile1080pHashHere" />
+                <podcast:source uri="http://example.onion/episode001-1080.mp4" />
+            </podcast:alternateEnclosure>
+            
+            <!-- HLS streaming version -->
+            <podcast:alternateEnclosure 
+                type="application/x-mpegURL" 
+                length="10562995"
+                title="HLS Stream">
+                <podcast:source uri="https://example.com/episode001/master.m3u8" />
+            </podcast:alternateEnclosure>
+            
+            <itunes:duration>45:00</itunes:duration>
+            <itunes:explicit>no</itunes:explicit>
+        </item>
+        
+        <item>
+            <title>Episode with Behind the Scenes Content</title>
+            <description>This episode has main content plus bonus material</description>
+            <pubDate>Mon, 06 Jan 2025 10:00:00 EST</pubDate>
+            <guid>episode-002</guid>
+            
+            <!-- Standard enclosure -->
+            <enclosure url="https://example.com/episode002.mp3" length="36000000" type="audio/mpeg" />
+            
+            <!-- Main episode content -->
+            <podcast:alternateEnclosure 
+                type="audio/mpeg" 
+                length="36000000" 
+                bitrate="128000" 
+                default="true">
+                <podcast:source uri="https://example.com/episode002.mp3" />
+            </podcast:alternateEnclosure>
+            
+            <!-- Behind the scenes bonus content (different rel) -->
+            <podcast:alternateEnclosure 
+                type="audio/mpeg" 
+                length="12000000" 
+                bitrate="128000"
+                title="Behind the Scenes" 
+                rel="bonus">
+                <podcast:source uri="https://example.com/episode002-bts.mp3" />
+            </podcast:alternateEnclosure>
+            
+            <itunes:duration>37:30</itunes:duration>
+            <itunes:explicit>no</itunes:explicit>
+        </item>
+        
+        <item>
+            <title>Episode with No Alternate Enclosures</title>
+            <description>This episode only has standard enclosure</description>
+            <pubDate>Sun, 05 Jan 2025 10:00:00 EST</pubDate>
+            <guid>episode-003</guid>
+            
+            <!-- Only standard enclosure, no alternateEnclosure -->
+            <enclosure url="https://example.com/episode003.mp3" length="28800000" type="audio/mpeg" />
+            
+            <itunes:duration>30:00</itunes:duration>
+            <itunes:explicit>no</itunes:explicit>
+        </item>
+    </channel>
+</rss>
