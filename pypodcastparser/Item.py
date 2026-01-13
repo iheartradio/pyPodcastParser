@@ -699,7 +699,7 @@ class Item(object):
             for source_tag in tag.find_all("source", recursive=False):
                 if source_tag.prefix == "podcast" or not source_tag.prefix:
                     source_dict = {}
-                    source_dict["uri"] = source_tag.get("uri", None)
+                    source_dict["url"] = source_tag.get("url", None)
                     source_dict["contentType"] = source_tag.get("contentType", None)
                     sources.append(source_dict)
 
