@@ -699,14 +699,14 @@ class TestAlternateEnclosureFeed(unittest.TestCase):
         self.assertEqual(len(mp3_enclosure["sources"]), 3)
         
         # Check HTTPS source
-        self.assertEqual(mp3_enclosure["sources"][0]["url"], "https://example.com/episode001.mp3")
+        self.assertEqual(mp3_enclosure["sources"][0]["uri"], "https://example.com/episode001.mp3")
         self.assertIsNone(mp3_enclosure["sources"][0]["contentType"])
         
         # Check IPFS source
-        self.assertEqual(mp3_enclosure["sources"][1]["url"], "ipfs://QmdwGqd3d2gFPGeJNLLCshdiPert45fMu84552Y4XHTy4y")
+        self.assertEqual(mp3_enclosure["sources"][1]["uri"], "ipfs://QmdwGqd3d2gFPGeJNLLCshdiPert45fMu84552Y4XHTy4y")
         
         # Check torrent source
-        self.assertEqual(mp3_enclosure["sources"][2]["url"], "https://example.com/episode001.torrent")
+        self.assertEqual(mp3_enclosure["sources"][2]["uri"], "https://example.com/episode001.torrent")
         self.assertEqual(mp3_enclosure["sources"][2]["contentType"], "application/x-bittorrent")
 
     def test_opus_alternate_enclosure(self):
@@ -734,7 +734,7 @@ class TestAlternateEnclosureFeed(unittest.TestCase):
         self.assertEqual(len(video_enclosure["sources"]), 3)
         
         # Check Tor source
-        self.assertIn("example.onion", video_enclosure["sources"][2]["url"])
+        self.assertIn("example.onion", video_enclosure["sources"][2]["uri"])
 
     def test_hls_alternate_enclosure(self):
         """Test HLS streaming alternate enclosure"""
@@ -744,7 +744,7 @@ class TestAlternateEnclosureFeed(unittest.TestCase):
         self.assertEqual(hls_enclosure["type"], "application/x-mpegURL")
         self.assertEqual(hls_enclosure["title"], "HLS Stream")
         self.assertEqual(len(hls_enclosure["sources"]), 1)
-        self.assertIn("master.m3u8", hls_enclosure["sources"][0]["url"])
+        self.assertIn("master.m3u8", hls_enclosure["sources"][0]["uri"])
 
     def test_second_item_with_rel_attribute(self):
         """Test second item with bonus content (different rel)"""
