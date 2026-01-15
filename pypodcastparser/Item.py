@@ -704,7 +704,6 @@ class Item(object):
                     source_dict["content_type"] = source_tag.get("contentType", None)
                     source_dict["integrity_type"] = None
                     source_dict["integrity_value"] = None
-                    
                     sources.append(source_dict)
 
             # Parse podcast:integrity elements and add to all sources (applies to the content itself)
