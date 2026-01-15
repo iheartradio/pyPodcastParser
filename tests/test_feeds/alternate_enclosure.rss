@@ -29,6 +29,7 @@
                 <podcast:source uri="https://example.com/episode001.mp3" />
                 <podcast:source uri="ipfs://QmdwGqd3d2gFPGeJNLLCshdiPert45fMu84552Y4XHTy4y" />
                 <podcast:source uri="https://example.com/episode001.torrent" contentType="application/x-bittorrent" />
+                <podcast:integrity type="sri" value="sha384-ExVqijpSE+cRZuKN5LoVBBsPA6dyjmRH5cXjqfiDD8fmtXi3pdb+qOiFvQdkWh1R" />
             </podcast:alternateEnclosure>
             
             <!-- High quality Opus version -->

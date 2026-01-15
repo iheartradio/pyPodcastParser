@@ -660,7 +660,7 @@ class Item(object):
             enclosure_dict = {}
 
             # Parse main alternateEnclosure attributes
-            enclosure_dict["type"] = tag.get("type", None)
+            enclosure_dict["mime_type"] = tag.get("type", None)
             enclosure_dict["length"] = tag.get("length", None)
             if enclosure_dict["length"]:
                 try:
@@ -688,11 +688,11 @@ class Item(object):
             enclosure_dict["codecs"] = tag.get("codecs", None)
 
             # Parse default attribute as boolean
-            default_value = tag.get("default", None)
+            default_value = tag.get("default", False)
             if default_value:
-                enclosure_dict["default"] = default_value.lower() in ["true", "1", "yes"]
+                enclosure_dict["default"] = True
             else:
-                enclosure_dict["default"] = None
+                enclosure_dict["default"] = False
 
             # Parse nested podcast:source elements
             sources = []
@@ -701,8 +701,21 @@ class Item(object):
                     source_dict = {}
                     # Support both 'uri' (spec) and 'url' (some feeds use this)
                     source_dict["uri"] = source_tag.get("uri", None) or source_tag.get("url", None)
-                    source_dict["contentType"] = source_tag.get("contentType", None)
+                    source_dict["content_type"] = source_tag.get("contentType", None)
+                    source_dict["integrity_type"] = None
+                    source_dict["integrity_value"] = None
+                    
                     sources.append(source_dict)
+
+            # Parse podcast:integrity elements and add to all sources (applies to the content itself)
+            for integrity_tag in tag.find_all("integrity", recursive=False):
+                if (integrity_tag.prefix == "podcast" or not integrity_tag.prefix) and len(sources) > 0:
+                    integrity_type = integrity_tag.get("type", None)
+                    integrity_value = integrity_tag.get("value", None)
+                    # Add integrity to all sources since it applies to the media content
+                    for source in sources:
+                        source["integrity_type"] = integrity_type
+                        source["integrity_value"] = integrity_value
 
             enclosure_dict["sources"] = sources
 

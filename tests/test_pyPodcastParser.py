@@ -685,7 +685,7 @@ class TestAlternateEnclosureFeed(unittest.TestCase):
         item = self.podcast.items[0]
         mp3_enclosure = item.alternate_enclosures[0]
         
-        self.assertEqual(mp3_enclosure["type"], "audio/mpeg")
+        self.assertEqual(mp3_enclosure["mime_type"], "audio/mpeg")
         self.assertEqual(mp3_enclosure["length"], 43200000)
         self.assertEqual(mp3_enclosure["bitrate"], 128000.0)
         self.assertEqual(mp3_enclosure["default"], True)
@@ -698,23 +698,41 @@ class TestAlternateEnclosureFeed(unittest.TestCase):
         
         self.assertEqual(len(mp3_enclosure["sources"]), 3)
         
-        # Check HTTPS source
+        # Check HTTPS source - all sources should have the same integrity
         self.assertEqual(mp3_enclosure["sources"][0]["uri"], "https://example.com/episode001.mp3")
-        self.assertIsNone(mp3_enclosure["sources"][0]["contentType"])
+        self.assertIsNone(mp3_enclosure["sources"][0]["content_type"])
+        self.assertEqual(mp3_enclosure["sources"][0]["integrity_type"], "sri")
+        self.assertEqual(mp3_enclosure["sources"][0]["integrity_value"], "sha384-ExVqijpSE+cRZuKN5LoVBBsPA6dyjmRH5cXjqfiDD8fmtXi3pdb+qOiFvQdkWh1R")
         
-        # Check IPFS source
+        # Check IPFS source - should also have integrity
         self.assertEqual(mp3_enclosure["sources"][1]["uri"], "ipfs://QmdwGqd3d2gFPGeJNLLCshdiPert45fMu84552Y4XHTy4y")
+        self.assertEqual(mp3_enclosure["sources"][1]["integrity_type"], "sri")
+        self.assertEqual(mp3_enclosure["sources"][1]["integrity_value"], "sha384-ExVqijpSE+cRZuKN5LoVBBsPA6dyjmRH5cXjqfiDD8fmtXi3pdb+qOiFvQdkWh1R")
         
-        # Check torrent source
+        # Check torrent source - should also have integrity
         self.assertEqual(mp3_enclosure["sources"][2]["uri"], "https://example.com/episode001.torrent")
-        self.assertEqual(mp3_enclosure["sources"][2]["contentType"], "application/x-bittorrent")
+        self.assertEqual(mp3_enclosure["sources"][2]["content_type"], "application/x-bittorrent")
+        self.assertEqual(mp3_enclosure["sources"][2]["integrity_type"], "sri")
+        self.assertEqual(mp3_enclosure["sources"][2]["integrity_value"], "sha384-ExVqijpSE+cRZuKN5LoVBBsPA6dyjmRH5cXjqfiDD8fmtXi3pdb+qOiFvQdkWh1R")
+
+    def test_mp3_alternate_enclosure_integrity(self):
+        """Test MP3 alternate enclosure has integrity in all sources"""
+        item = self.podcast.items[0]
+        mp3_enclosure = item.alternate_enclosures[0]
+        
+        # Check that all sources have the same integrity values
+        for source in mp3_enclosure["sources"]:
+            self.assertIsNotNone(source["integrity_type"])
+            self.assertIsNotNone(source["integrity_value"])
+            self.assertEqual(source["integrity_type"], "sri")
+            self.assertEqual(source["integrity_value"], "sha384-ExVqijpSE+cRZuKN5LoVBBsPA6dyjmRH5cXjqfiDD8fmtXi3pdb+qOiFvQdkWh1R")
 
     def test_opus_alternate_enclosure(self):
         """Test Opus alternate enclosure parsing"""
         item = self.podcast.items[0]
         opus_enclosure = item.alternate_enclosures[1]
         
-        self.assertEqual(opus_enclosure["type"], "audio/opus")
+        self.assertEqual(opus_enclosure["mime_type"], "audio/opus")
         self.assertEqual(opus_enclosure["length"], 32400000)
         self.assertEqual(opus_enclosure["bitrate"], 96000.0)
         self.assertEqual(opus_enclosure["title"], "High Quality Opus")
@@ -725,7 +743,7 @@ class TestAlternateEnclosureFeed(unittest.TestCase):
         item = self.podcast.items[0]
         video_enclosure = item.alternate_enclosures[2]
         
-        self.assertEqual(video_enclosure["type"], "video/mp4")
+        self.assertEqual(video_enclosure["mime_type"], "video/mp4")
         self.assertEqual(video_enclosure["length"], 10562995)
         self.assertEqual(video_enclosure["bitrate"], 681483.55)
         self.assertEqual(video_enclosure["height"], 1080)
@@ -741,7 +759,7 @@ class TestAlternateEnclosureFeed(unittest.TestCase):
         item = self.podcast.items[0]
         hls_enclosure = item.alternate_enclosures[3]
         
-        self.assertEqual(hls_enclosure["type"], "application/x-mpegURL")
+        self.assertEqual(hls_enclosure["mime_type"], "application/x-mpegURL")
         self.assertEqual(hls_enclosure["title"], "HLS Stream")
         self.assertEqual(len(hls_enclosure["sources"]), 1)
         self.assertIn("master.m3u8", hls_enclosure["sources"][0]["uri"])
