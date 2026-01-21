@@ -797,6 +797,22 @@ class TestAlternateEnclosureFeed(unittest.TestCase):
         self.assertIn("alternate_enclosures", item_dict)
         self.assertEqual(len(item_dict["alternate_enclosures"]), 4)
 
+    def test_to_dict_includes_enclosure_object(self):
+        """Test that to_dict() includes enclosure object with length and mime_type"""
+        item = self.podcast.items[0]
+        item_dict = item.to_dict()
+        
+        self.assertIn("enclosure", item_dict)
+        self.assertIsInstance(item_dict["enclosure"], dict)
+        self.assertIn("url", item_dict["enclosure"])
+        self.assertIn("enclosure_length", item_dict["enclosure"])
+        self.assertIn("mime_type", item_dict["enclosure"])
+        
+        # Verify the values match the item attributes
+        self.assertEqual(item_dict["enclosure"]["url"], item.enclosure_url)
+        self.assertEqual(item_dict["enclosure"]["enclosure_length"], item.enclosure_length)
+        self.assertEqual(item_dict["enclosure"]["mime_type"], item.enclosure_type)
+
     def test_optional_attributes_can_be_none(self):
         """Test that optional attributes are None when not present"""
         item = self.podcast.items[0]
