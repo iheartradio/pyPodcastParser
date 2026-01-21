@@ -806,12 +806,12 @@ class TestAlternateEnclosureFeed(unittest.TestCase):
         self.assertIsInstance(item_dict["enclosure"], dict)
         self.assertIn("url", item_dict["enclosure"])
         self.assertIn("enclosure_length", item_dict["enclosure"])
-        self.assertIn("mime_type", item_dict["enclosure"])
+        self.assertIn("enclosure_type", item_dict["enclosure"])
         
         # Verify the values match the item attributes
         self.assertEqual(item_dict["enclosure"]["url"], item.enclosure_url)
         self.assertEqual(item_dict["enclosure"]["enclosure_length"], item.enclosure_length)
-        self.assertEqual(item_dict["enclosure"]["mime_type"], item.enclosure_type)
+        self.assertEqual(item_dict["enclosure"]["enclosure_type"], item.enclosure_type)
 
     def test_optional_attributes_can_be_none(self):
         """Test that optional attributes are None when not present"""

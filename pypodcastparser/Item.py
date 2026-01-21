@@ -262,7 +262,7 @@ class Item(object):
         item["enclosure"] = {
             "url": self.enclosure_url,
             "enclosure_length": self.enclosure_length,
-            "mime_type": self.enclosure_type
+            "enclosure_type": self.enclosure_type
         }
         item["transcription"] = self.podcast_transcript
         item["alternate_enclosures"] = self.alternate_enclosures
