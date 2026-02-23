@@ -264,7 +264,6 @@ class Item(object):
         item["transcription"] = self.podcast_transcript
         item["alternate_enclosures"] = self.alternate_enclosures
 
-
         return item
 
     def set_rss_element(self):
