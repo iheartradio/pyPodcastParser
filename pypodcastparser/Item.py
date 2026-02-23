@@ -691,11 +691,9 @@ class Item(object):
             enclosure_dict["codecs"] = tag.get("codecs", None)
 
             # Parse default attribute as boolean
-            default_value = tag.get("default", False)
-            if default_value:
-                enclosure_dict["default"] = True
-            else:
-                enclosure_dict["default"] = False
+            default_value = tag.get("default", "False")
+            falsy_strings = ("false", "0", "no", "False")
+            enclosure_dict["default"] = default_value.lower() not in falsy_strings
 
             # Parse nested podcast:source elements
             sources = []
