@@ -654,5 +654,160 @@ class TestInvalidEpisodeDates(unittest.TestCase):
         )
 
 
+class TestAlternateEnclosureFeed(unittest.TestCase):
+    def setUp(self):
+        test_dir = os.path.dirname(__file__)
+        test_feeds_dir = os.path.join(test_dir, "test_feeds")
+        alt_enclosure_path = os.path.join(test_feeds_dir, "alternate_enclosure.rss")
+        alt_enclosure_file = open(alt_enclosure_path, "rb")
+        self.alt_enclosure_feed = alt_enclosure_file.read()
+        self.podcast = Podcast.Podcast(self.alt_enclosure_feed)
+
+    def test_item_count(self):
+        """Test that all three items are parsed"""
+        self.assertEqual(len(self.podcast.items), 3)
+
+    def test_first_item_has_alternate_enclosures(self):
+        """Test that first item has multiple alternate enclosures"""
+        item = self.podcast.items[0]
+        self.assertIsNotNone(item.alternate_enclosures)
+        self.assertEqual(len(item.alternate_enclosures), 4)
+
+    def test_standard_enclosure_still_works(self):
+        """Test that standard enclosure attributes are still parsed"""
+        item = self.podcast.items[0]
+        self.assertEqual(item.enclosure_url, "https://example.com/episode001.mp3")
+        self.assertEqual(item.enclosure_type, "audio/mpeg")
+        self.assertEqual(item.enclosure_length, 43200000)
+
+    def test_mp3_alternate_enclosure_attributes(self):
+        """Test MP3 alternate enclosure with default=true"""
+        item = self.podcast.items[0]
+        mp3_enclosure = item.alternate_enclosures[0]
+        
+        self.assertEqual(mp3_enclosure["mime_type"], "audio/mpeg")
+        self.assertEqual(mp3_enclosure["length"], 43200000)
+        self.assertEqual(mp3_enclosure["bitrate"], 128000.0)
+        self.assertEqual(mp3_enclosure["default"], True)
+        self.assertEqual(mp3_enclosure["title"], "Standard MP3")
+
+    def test_mp3_alternate_enclosure_sources(self):
+        """Test MP3 alternate enclosure has multiple sources"""
+        item = self.podcast.items[0]
+        mp3_enclosure = item.alternate_enclosures[0]
+        
+        self.assertEqual(len(mp3_enclosure["sources"]), 3)
+        
+        # Check HTTPS source - all sources should have the same integrity
+        self.assertEqual(mp3_enclosure["sources"][0]["uri"], "https://example.com/episode001.mp3")
+        self.assertIsNone(mp3_enclosure["sources"][0]["content_type"])
+        self.assertEqual(mp3_enclosure["sources"][0]["integrity_type"], "sri")
+        self.assertEqual(mp3_enclosure["sources"][0]["integrity_value"], "sha384-ExVqijpSE+cRZuKN5LoVBBsPA6dyjmRH5cXjqfiDD8fmtXi3pdb+qOiFvQdkWh1R")
+        
+        # Check IPFS source - should also have integrity
+        self.assertEqual(mp3_enclosure["sources"][1]["uri"], "ipfs://QmdwGqd3d2gFPGeJNLLCshdiPert45fMu84552Y4XHTy4y")
+        self.assertEqual(mp3_enclosure["sources"][1]["integrity_type"], "sri")
+        self.assertEqual(mp3_enclosure["sources"][1]["integrity_value"], "sha384-ExVqijpSE+cRZuKN5LoVBBsPA6dyjmRH5cXjqfiDD8fmtXi3pdb+qOiFvQdkWh1R")
+        
+        # Check torrent source - should also have integrity
+        self.assertEqual(mp3_enclosure["sources"][2]["uri"], "https://example.com/episode001.torrent")
+        self.assertEqual(mp3_enclosure["sources"][2]["content_type"], "application/x-bittorrent")
+        self.assertEqual(mp3_enclosure["sources"][2]["integrity_type"], "sri")
+        self.assertEqual(mp3_enclosure["sources"][2]["integrity_value"], "sha384-ExVqijpSE+cRZuKN5LoVBBsPA6dyjmRH5cXjqfiDD8fmtXi3pdb+qOiFvQdkWh1R")
+
+    def test_mp3_alternate_enclosure_integrity(self):
+        """Test MP3 alternate enclosure has integrity in all sources"""
+        item = self.podcast.items[0]
+        mp3_enclosure = item.alternate_enclosures[0]
+        
+        # Check that all sources have the same integrity values
+        for source in mp3_enclosure["sources"]:
+            self.assertIsNotNone(source["integrity_type"])
+            self.assertIsNotNone(source["integrity_value"])
+            self.assertEqual(source["integrity_type"], "sri")
+            self.assertEqual(source["integrity_value"], "sha384-ExVqijpSE+cRZuKN5LoVBBsPA6dyjmRH5cXjqfiDD8fmtXi3pdb+qOiFvQdkWh1R")
+
+    def test_opus_alternate_enclosure(self):
+        """Test Opus alternate enclosure parsing"""
+        item = self.podcast.items[0]
+        opus_enclosure = item.alternate_enclosures[1]
+        
+        self.assertEqual(opus_enclosure["mime_type"], "audio/opus")
+        self.assertEqual(opus_enclosure["length"], 32400000)
+        self.assertEqual(opus_enclosure["bitrate"], 96000.0)
+        self.assertEqual(opus_enclosure["title"], "High Quality Opus")
+        self.assertEqual(len(opus_enclosure["sources"]), 2)
+
+    def test_video_alternate_enclosure(self):
+        """Test video alternate enclosure with height, codecs, and lang"""
+        item = self.podcast.items[0]
+        video_enclosure = item.alternate_enclosures[2]
+        
+        self.assertEqual(video_enclosure["mime_type"], "video/mp4")
+        self.assertEqual(video_enclosure["length"], 10562995)
+        self.assertEqual(video_enclosure["bitrate"], 681483.55)
+        self.assertEqual(video_enclosure["height"], 1080)
+        self.assertEqual(video_enclosure["codecs"], "avc1.64001f, mp4a.40.2")
+        self.assertEqual(video_enclosure["lang"], "en")
+        self.assertEqual(len(video_enclosure["sources"]), 3)
+        
+        # Check Tor source
+        self.assertIn("example.onion", video_enclosure["sources"][2]["uri"])
+
+    def test_hls_alternate_enclosure(self):
+        """Test HLS streaming alternate enclosure"""
+        item = self.podcast.items[0]
+        hls_enclosure = item.alternate_enclosures[3]
+        
+        self.assertEqual(hls_enclosure["mime_type"], "application/x-mpegURL")
+        self.assertEqual(hls_enclosure["title"], "HLS Stream")
+        self.assertEqual(len(hls_enclosure["sources"]), 1)
+        self.assertIn("master.m3u8", hls_enclosure["sources"][0]["uri"])
+
+    def test_second_item_with_rel_attribute(self):
+        """Test second item with bonus content (different rel)"""
+        item = self.podcast.items[1]
+        self.assertEqual(len(item.alternate_enclosures), 2)
+        
+        # Check main content
+        main_enclosure = item.alternate_enclosures[0]
+        self.assertEqual(main_enclosure["default"], True)
+        self.assertIsNone(main_enclosure["rel"])
+        
+        # Check bonus content
+        bonus_enclosure = item.alternate_enclosures[1]
+        self.assertEqual(bonus_enclosure["title"], "Behind the Scenes")
+        self.assertEqual(bonus_enclosure["rel"], "bonus")
+        self.assertEqual(bonus_enclosure["length"], 12000000)
+
+    def test_third_item_no_alternate_enclosures(self):
+        """Test third item has no alternate enclosures"""
+        item = self.podcast.items[2]
+        self.assertEqual(len(item.alternate_enclosures), 0)
+        
+        # But standard enclosure should still work
+        self.assertEqual(item.enclosure_url, "https://example.com/episode003.mp3")
+        self.assertEqual(item.enclosure_length, 28800000)
+
+    def test_to_dict_includes_alternate_enclosures(self):
+        """Test that to_dict() includes alternate_enclosures"""
+        item = self.podcast.items[0]
+        item_dict = item.to_dict()
+        
+        self.assertIn("alternate_enclosures", item_dict)
+        self.assertEqual(len(item_dict["alternate_enclosures"]), 4)
+
+    def test_optional_attributes_can_be_none(self):
+        """Test that optional attributes are None when not present"""
+        item = self.podcast.items[0]
+        mp3_enclosure = item.alternate_enclosures[0]
+        
+        # These attributes weren't specified for MP3 enclosure
+        self.assertIsNone(mp3_enclosure["height"])
+        self.assertIsNone(mp3_enclosure["lang"])
+        self.assertIsNone(mp3_enclosure["codecs"])
+        self.assertIsNone(mp3_enclosure["rel"])
+
+
 if __name__ == "__main__":
     unittest.main()

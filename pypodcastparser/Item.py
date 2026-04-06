@@ -170,6 +170,7 @@ class Item(object):
         self.is_interactive = None
         self.podcast_transcript = None
         self.transcriptionList = []
+        self.alternate_enclosures = []
 
         tag_methods = {
             (None, "title"): self.set_title,
@@ -193,6 +194,7 @@ class Item(object):
             ("itunes", "subtitle"): self.set_itunes_subtitle,
             ("itunes", "summary"): self.set_itunes_summary,
             ("ihr", "interactive"): self.set_interactive,
+            ("podcast", "alternateEnclosure"): self.set_alternate_enclosure,
         }
 
         # Populate attributes based on feed content
@@ -201,7 +203,7 @@ class Item(object):
                 continue
             try:
                 # Using get instead of pop since there can be multiple transcript tags (meaning we don't want to get rid of method after use)
-                if c.name == "transcript":
+                if c.name == "transcript" or c.name == "alternateEnclosure":
                     tag_method = tag_methods.get((c.prefix, c.name))
                 else:
                     # Pop method to skip duplicated tag on invalid feeds
@@ -257,7 +259,10 @@ class Item(object):
         item["episode_title"] = self.title
         item["interactive"] = self.interactive
         item["external_url"] = self.enclosure_url
+        item["enclosure_type"] = self.enclosure_type
+        item["enclosure_length"] = self.enclosure_length
         item["transcription"] = self.podcast_transcript
+        item["alternate_enclosures"] = self.alternate_enclosures
 
         return item
 
@@ -645,4 +650,80 @@ class Item(object):
         except Exception:
             raise InvalidPodcastFeed(
                 f"Invalid Podcast Feed, episode level ihr:interactive: {tag.string}, could not be parsed"
+            )
+
+    def set_alternate_enclosure(self, tag):
+        """Parses podcast:alternateEnclosure and its nested podcast:source elements.
+
+        The alternateEnclosure element provides alternative media versions with different
+        formats, quality levels, and transport methods (HTTPS, IPFS, torrents, etc.).
+        """
+        try:
+            enclosure_dict = {}
+
+            # Parse main alternateEnclosure attributes
+            enclosure_dict["mime_type"] = tag.get("type", None)
+            enclosure_dict["length"] = tag.get("length", None)
+            if enclosure_dict["length"]:
+                try:
+                    enclosure_dict["length"] = int(enclosure_dict["length"])
+                except (ValueError, TypeError):
+                    pass
+
+            enclosure_dict["bitrate"] = tag.get("bitrate", None)
+            if enclosure_dict["bitrate"]:
+                try:
+                    enclosure_dict["bitrate"] = float(enclosure_dict["bitrate"])
+                except (ValueError, TypeError):
+                    pass
+
+            enclosure_dict["height"] = tag.get("height", None)
+            if enclosure_dict["height"]:
+                try:
+                    enclosure_dict["height"] = int(enclosure_dict["height"])
+                except (ValueError, TypeError):
+                    pass
+
+            enclosure_dict["lang"] = tag.get("lang", None)
+            enclosure_dict["title"] = tag.get("title", None)
+            enclosure_dict["rel"] = tag.get("rel", None)
+            enclosure_dict["codecs"] = tag.get("codecs", None)
+
+            # Parse default attribute as boolean
+            default_value = tag.get("default", "False")
+            falsy_strings = ("false", "0", "no", "False")
+            enclosure_dict["default"] = default_value.lower() not in falsy_strings
+
+            # Parse nested podcast:source elements
+            sources = []
+            for source_tag in tag.find_all("source", recursive=False):
+                if source_tag.prefix == "podcast" or not source_tag.prefix:
+                    source_dict = {}
+                    # Support both 'uri' (spec) and 'url' (some feeds use this)
+                    source_dict["uri"] = source_tag.get("uri", None) or source_tag.get("url", None)
+                    source_dict["content_type"] = source_tag.get("contentType", None)
+                    source_dict["integrity_type"] = None
+                    source_dict["integrity_value"] = None
+                    sources.append(source_dict)
+
+            # Parse podcast:integrity elements and add to all sources (applies to the content itself)
+            for integrity_tag in tag.find_all("integrity", recursive=False):
+                if (integrity_tag.prefix == "podcast" or not integrity_tag.prefix) and len(sources) > 0:
+                    integrity_type = integrity_tag.get("type", None)
+                    integrity_value = integrity_tag.get("value", None)
+                    # Add integrity to all sources since it applies to the media content
+                    for source in sources:
+                        source["integrity_type"] = integrity_type
+                        source["integrity_value"] = integrity_value
+
+            enclosure_dict["sources"] = sources
+
+            self.alternate_enclosures.append(enclosure_dict)
+
+        except AttributeError:
+            # If there's an issue parsing, we don't add it to the list
+            pass
+        except Exception:
+            raise InvalidPodcastFeed(
+                "Invalid Podcast Feed, episode level podcast:alternateEnclosure could not be parsed"
             )
