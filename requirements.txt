@@ -20,6 +20,8 @@ lxml==4.5.2
     # via -r requirements.in
 pluggy==0.13.1
     # via -r requirements.in
+python-dateutil==2.9.0.post0
+    # via -r requirements.in
 pytz==2022.7.1
     # via -r requirements.in
 requests==2.24.0
