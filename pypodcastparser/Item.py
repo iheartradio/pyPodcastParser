@@ -174,7 +174,7 @@ class Item(object):
                 continue
             try:
                 # Using get instead of pop since there can be multiple transcript tags (meaning we don't want to get rid of method after use)
-                if c.name == "transcript":
+                if c.name == "transcript" or c.name == "alternateEnclosure":
                     tag_method = tag_methods.get((c.prefix, c.name))
                 else:
                     # Pop method to skip duplicated tag on invalid feeds
@@ -536,7 +536,7 @@ class Item(object):
             raise InvalidPodcastFeed(
                 f"Invalid Podcast Feed, episode level ihr:interactive: {tag.string}, could not be parsed"
             )
-        
+    
     def set_alternate_enclosure(self, tag):
         """Parses podcast:alternateEnclosure and its nested podcast:source elements.
 
@@ -612,3 +612,4 @@ class Item(object):
             raise InvalidPodcastFeed(
                 "Invalid Podcast Feed, episode level podcast:alternateEnclosure could not be parsed"
             )
+        
