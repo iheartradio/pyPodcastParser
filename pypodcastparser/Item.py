@@ -230,7 +230,10 @@ class Item(object):
         item["episode_title"] = self.title
         item["interactive"] = self.interactive
         item["external_url"] = self.enclosure_url
+        item["enclosure_type"] = self.enclosure_type
+        item["enclosure_length"] = self.enclosure_length
         item["transcription"] = self.podcast_transcript
+        item["alternate_enclosures"] = self.alternate_enclosures
 
         return item
 
@@ -536,7 +539,7 @@ class Item(object):
             raise InvalidPodcastFeed(
                 f"Invalid Podcast Feed, episode level ihr:interactive: {tag.string}, could not be parsed"
             )
-    
+
     def set_alternate_enclosure(self, tag):
         """Parses podcast:alternateEnclosure and its nested podcast:source elements.
 
@@ -612,4 +615,3 @@ class Item(object):
             raise InvalidPodcastFeed(
                 "Invalid Podcast Feed, episode level podcast:alternateEnclosure could not be parsed"
             )
-        
