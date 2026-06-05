@@ -11,9 +11,9 @@ Reminder on the contract:
   returns naive wall-clock as "YYYY-MM-DD HH:MM:SS".
 """
 import datetime
+from unittest import mock
 
 import pytest
-import pytz
 
 from pypodcastparser.Podcast import Podcast
 
@@ -137,19 +137,23 @@ def test_malformed_item_pubdate_falls_back_to_now():
     (legacy contract). Show-level pubDate is valid so the parse reaches
     the item dispatch.
 
-    Allow a 2-second window for drift between the parse call and the
-    assertion's `datetime.now`.
+    `datetime.now` is frozen so the fallback is deterministic. Comparing a
+    parse-time timestamp against a fresh `now()` at assert time is a
+    wall-clock race that flakes on cold CI runs (first run is ~5x slower
+    from imports/bytecode compilation).
     """
+    from pypodcastparser import Item as item_module
+
+    frozen = datetime.datetime(2024, 6, 15, 9, 30, 0, tzinfo=item_module._US_EASTERN)
     feed = _make_feed("nonsense-not-a-date", show_date=_VALID_SHOW_DATE)
-    podcast = Podcast(feed)
-    item_date = podcast.items[0].published_date
-    assert item_date is not None
-    parsed = datetime.datetime.strptime(item_date, "%Y-%m-%d %H:%M:%S")
-    now_eastern = datetime.datetime.now(pytz.timezone("US/Eastern")).replace(tzinfo=None)
-    delta = abs((now_eastern - parsed).total_seconds())
-    assert delta < 2.0, (
-        f"item.published_date {item_date!r} not within 2s of now ({now_eastern!r})"
-    )
+
+    with mock.patch("pypodcastparser.Item.datetime") as mock_datetime:
+        mock_datetime.datetime.now.return_value = frozen
+        mock_datetime.date = datetime.date  # keep real date for other code paths
+        podcast = Podcast(feed)
+        item_date = podcast.items[0].published_date
+
+    assert item_date == "2024-06-15 09:30:00"
 
 
 def test_malformed_show_pubdate_raises():

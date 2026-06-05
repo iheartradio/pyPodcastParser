@@ -2,22 +2,9 @@
 from bs4 import BeautifulSoup, Tag
 import datetime
 import email.utils
-from dateutil import parser as _dateutil_parser, tz as _dateutil_tz
-from pypodcastparser.Item import Item, common_timezones
+from dateutil import parser as _dateutil_parser
+from pypodcastparser.Item import Item, _TZ_INFOS
 from pypodcastparser.Error import InvalidPodcastFeed
-
-
-# dateutil tzinfos: maps RFC 2822 tz abbreviations to tzinfo objects so
-# `dateutil.parser.parse` can resolve things like "EDT", "PST" that it
-# doesn't ship with by default. GMT/UTC and numeric offsets are handled
-# natively. Sourced from Item.common_timezones for a single source of truth.
-_TZ_INFOS = {abbrev: _dateutil_tz.gettz(iana) for abbrev, iana in common_timezones.items()}
-# RFC 2822 daylight-saving abbreviations that aren't in common_timezones —
-# mirrors Item._TZ_INFOS so show + item dispatch agree on the same vocabulary.
-_TZ_INFOS.setdefault("EDT", _dateutil_tz.gettz("US/Eastern"))
-_TZ_INFOS.setdefault("ET", _dateutil_tz.gettz("US/Eastern"))
-_TZ_INFOS.setdefault("CDT", _dateutil_tz.gettz("US/Central"))
-_TZ_INFOS.setdefault("MDT", _dateutil_tz.gettz("America/Denver"))
 
 
 class Podcast:

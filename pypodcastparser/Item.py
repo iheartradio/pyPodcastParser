@@ -324,7 +324,7 @@ class Item(object):
             normalized = parsed.astimezone(_US_EASTERN).replace(tzinfo=None)
             self.published_date = str(normalized)
             LOGGER.info("Final Published Date EST: %s", self.published_date)
-        except Exception:
+        except (ValueError, TypeError, OverflowError, _dateutil_parser.ParserError):
             self.published_date = datetime.datetime.now(_US_EASTERN).strftime(
                 "%Y-%m-%d %H:%M:%S"
             )
