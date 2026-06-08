@@ -57,9 +57,9 @@ common_timezones = {
 }
 
 # dateutil tzinfos: lets `dateutil.parser.parse` resolve abbreviations like
-# "EDT" / "PST" that it doesn't ship with by default. GMT/UTC and numeric
-# offsets (e.g. "+1000", "-0500") are handled natively, so they're not
-# listed here.
+# "EDT" / "PST" that it doesn't ship with by default.
+# (dateutil already understands numeric offsets and generally handles GMT/UTC,
+# but we keep them in `common_timezones`/`_TZ_INFOS` for consistency.)
 _TZ_INFOS = {abbrev: _dateutil_tz.gettz(iana) for abbrev, iana in common_timezones.items()}
 # RFC 2822 daylight-saving abbreviations that aren't in common_timezones.
 # Each maps to its DST-aware IANA zone so localizing a date during DST
