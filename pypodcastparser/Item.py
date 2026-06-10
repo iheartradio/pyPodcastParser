@@ -1,19 +1,16 @@
 from bs4 import Tag
 
 import datetime
-from datetime import timezone
 import email.utils
-import re
-import pytz
 import logging
+
+from dateutil import parser as _dateutil_parser, tz as _dateutil_tz
 
 from pypodcastparser.Error import InvalidPodcastFeed
 
 
 LOGGER = logging.getLogger(__name__)
 
-
-pytz_timezone_list = [tz for tz in pytz.all_timezones]
 
 common_timezones = {
     "IDLW": "Pacific/Midway",
@@ -59,46 +56,20 @@ common_timezones = {
     "NZST": "Pacific/Auckland",
 }
 
-# Map of timezone offsets to timezone abbreviations
-offset_map = {
-    "-1200": "IDLW",
-    "-1100": "NUT",
-    "-1000": "HST",
-    "-0930": "MART",
-    "-0900": "AKST",
-    "-0800": "PST",
-    "-0700": "MST",
-    "-0600": "CST",
-    "-0500": "EST",
-    "-0430": "VET",
-    "-0400": "AST",
-    "-0330": "NST",
-    "-0300": "BRT",
-    "-0200": "GST",
-    "-0100": "AZOT",
-    "-0000": "GMT",
-    "+0000": "GMT",
-    "+0100": "CET",
-    "+0200": "EET",
-    "+0300": "MSK",
-    "+0400": "GST",
-    "+0500": "PKT",
-    "+0545": "NPT",
-    "+0600": "BST",
-    "+0630": "MMT",
-    "+0700": "ICT",
-    "+0800": "AWST",
-    "+0845": "ACWST",
-    "+0900": "JST",
-    "+0930": "ACST",
-    "+1000": "AEST",
-    "+1030": "ACST",
-    "+1100": "AEDT",
-    "+1200": "NZST",
-    "+1245": "CHAST",
-    "+1300": "NZDT",
-    "+1400": "LINT",
-}
+# dateutil tzinfos: lets `dateutil.parser.parse` resolve abbreviations like
+# "EDT" / "PST" that it doesn't ship with by default.
+# (dateutil already understands numeric offsets and generally handles GMT/UTC,
+# but we keep them in `common_timezones`/`_TZ_INFOS` for consistency.)
+_TZ_INFOS = {abbrev: _dateutil_tz.gettz(iana) for abbrev, iana in common_timezones.items()}
+# RFC 2822 daylight-saving abbreviations that aren't in common_timezones.
+# Each maps to its DST-aware IANA zone so localizing a date during DST
+# yields the correct UTC offset.
+_TZ_INFOS.setdefault("EDT", _dateutil_tz.gettz("US/Eastern"))
+_TZ_INFOS.setdefault("ET", _dateutil_tz.gettz("US/Eastern"))
+_TZ_INFOS.setdefault("CDT", _dateutil_tz.gettz("US/Central"))
+_TZ_INFOS.setdefault("MDT", _dateutil_tz.gettz("America/Denver"))
+
+_US_EASTERN = _dateutil_tz.gettz("US/Eastern")
 
 
 class Item(object):
@@ -332,114 +303,31 @@ class Item(object):
                 "Invalid Podcast Feed, episode level guid could not be parsed"
             )
 
-    # TODO convert to one timezone
     def set_published_date(self, tag):
-        """Parses published date and set value."""
+        """Parses item-level published date, normalizes to US/Eastern,
+        and stores as a naive wall-clock string ("YYYY-MM-DD HH:MM:SS").
+
+        On any parse failure, falls back to the current US/Eastern time —
+        matches legacy behavior so downstream consumers always get *a*
+        date even when the feed's pubDate is malformed.
+        """
+        text = tag.string
+        if text is None:
+            return
+        self.published_date = text
+        self.published_date_string = text
         try:
-            self.published_date = tag.string
-            self.published_date_string = tag.string
-
-            deconstructed_date = self.published_date_string.split(" ")
-            if len(deconstructed_date) < 4:
-                raise AttributeError
-
-            published_date_timezone = ""
-            # Check for timezone abbreviation
-            if re.match("^[a-zA-Z]{3}$", deconstructed_date[-1]):
-                published_date_timezone = deconstructed_date[-1]
-                deconstructed_date.pop()
-            else:
-                # Check for specific timezone offsets
-                for offset, tz in offset_map.items():
-                    if offset in self.published_date:
-                        published_date_timezone = tz
-                        deconstructed_date.pop()
-                        break
-            if not published_date_timezone:
-                published_date_timezone = "EST"
-
-            regex_array = [
-                r"^[a-zA-Z]{3},$",  # Raw string, so \ is treated literally
-                r"^\d{1,2}$",
-                r"^[a-zA-Z]{3}$",
-                r"^\d{4}$",
-                r"^\d\d:\d\d",
-            ]
-
-            new_array = []
-            for array_index, array_value in enumerate(regex_array):
-                if re.match(deconstructed_date[array_index], array_value):
-                    new_array.append(array_value)
-                else:
-                    for inner_index, inner_value in enumerate(deconstructed_date):
-                        if re.match(regex_array[array_index], inner_value):
-                            new_array.append(inner_value)
-                            break
-            date_string = (
-                new_array[0]
-                + " "
-                + new_array[1]
-                + " "
-                + new_array[2]
-                + " "
-                + new_array[3]
-                + " "
-                + new_array[4]
+            parsed = _dateutil_parser.parse(text, tzinfos=_TZ_INFOS)
+            # No tz in the input → default to EST, mirroring legacy.
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=_US_EASTERN)
+            normalized = parsed.astimezone(_US_EASTERN).replace(tzinfo=None)
+            self.published_date = str(normalized)
+            LOGGER.info("Final Published Date EST: %s", self.published_date)
+        except (ValueError, TypeError, OverflowError, _dateutil_parser.ParserError):
+            self.published_date = datetime.datetime.now(_US_EASTERN).strftime(
+                "%Y-%m-%d %H:%M:%S"
             )
-
-            if len(new_array) != 5:
-                raise AttributeError(
-                    "Error creating new date array. Array is not of length 5 for formatting"
-                )
-
-            time = date_string.split(":")
-            if len(time) == 2:
-                minutes = time[1].split(" ")
-                minutes[0] += ":00"
-                time[0] += ":" + minutes[0]
-                self.published_date = datetime.datetime.strptime(
-                    time[0], "%a, %d %b %Y %H:%M:%S"
-                )
-
-            elif len(time) == 3:
-                time[0] += ":" + time[1]
-                seconds = time[2]
-                seconds_string = seconds[:2]
-                time[0] += ":" + seconds_string
-                self.published_date = datetime.datetime.strptime(
-                    time[0], "%a, %d %b %Y %H:%M:%S"
-                )
-            else:
-                now = datetime.datetime.now(timezone.utc)
-                published_date_timezone = "UTC"
-                self.published_date = datetime.datetime.strptime(
-                    now, "%a, %d %b %Y %H:%M:%S"
-                )
-
-            if published_date_timezone not in ["ET", "EST", "EDT"]:
-                if published_date_timezone in pytz_timezone_list:
-                    current_timezone = pytz.timezone(published_date_timezone)
-                else:
-                    current_timezone = pytz.timezone(
-                        common_timezones.get(published_date_timezone)
-                    )
-
-                date_in_current_timezone = current_timezone.localize(
-                    self.published_date
-                )
-                self.published_date = str(
-                    (
-                        date_in_current_timezone.astimezone(pytz.timezone("US/Eastern"))
-                    ).replace(tzinfo=None)
-                )
-                LOGGER.info("Final Published Date EST: {}".format(self.published_date))
-            else:
-                LOGGER.info("Final Published Date EST: {}".format(self.published_date))
-
-        except Exception:
-            self.published_date = datetime.datetime.now(
-                pytz.timezone("US/Eastern")
-            ).strftime("%Y-%m-%d %H:%M:%S")
 
     def set_title(self, tag):
         """Parses title and set value."""

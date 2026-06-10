@@ -9,28 +9,35 @@ pypodcastparser is a podcast parser. It should parse any RSS file, but it specia
 
 
 ## Installation
+
 Before you start:
 
-- Services should always be run inside of virtualenvs_.
-- Dependencies are managed with pip_ and pip-tools_. Virtualenvs come with
-  pip preinstalled; pip-tools should be installed manually with ``python -m pip
-  install pip-tools``.
-- Make sure you have follow the steps
-[here](https://github.com/iheartradio/content-platform-documentation/blob/master/private_python_modules/README.md)
-so you can download our private repositories.
+- Python 3.9.1 is required (see `.python-version`).
+- Services should always be run inside of [virtualenvs](https://virtualenv.pypa.io/).
+- Dependencies are managed with [pip](https://pip.pypa.io/) and [pip-tools](https://github.com/nvie/pip-tools/).
+  Virtualenvs come with pip preinstalled; pip-tools should be installed manually.
+- Make sure you have followed the steps
+  [here](https://github.com/iheartradio/content-platform-documentation/blob/master/private_python_modules/README.md)
+  so you can download our private repositories.
+- Copy `settings.ini.example` to `settings.ini` and configure it for your environment.
 
-Before the first run of the service::
+Before the first run of the service, make sure you are in your virtual environment:
 
-    $ pip install pip-tools
-    $ pip install -r requirements-dev.txt
-    $ pre-commit install
-    $ pip-compile requirements.in
-    $ pip install -r requirements.txt
+```bash
+pyenv activate <your-virtualenv>
+```
 
+Then install the dependencies:
 
-.. _virtualenvs: https://virtualenv.pypa.io/
-.. _pip: https://pip.pypa.io/
-.. _pip-tools: https://github.com/nvie/pip-tools/
+```bash
+pip install pip-tools
+pip-compile requirements.in
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+pre-commit install
+```
+
+Pre-commit will run black and flake8 on commits to enforce coding styles with production scripts.
 
 
 # Running tests locally

@@ -2,7 +2,8 @@
 from bs4 import BeautifulSoup, Tag
 import datetime
 import email.utils
-from pypodcastparser.Item import Item
+from dateutil import parser as _dateutil_parser
+from pypodcastparser.Item import Item, _TZ_INFOS
 from pypodcastparser.Error import InvalidPodcastFeed
 
 
@@ -376,23 +377,25 @@ class Podcast:
             raise InvalidPodcastFeed("Invalid Podcast Feed, show level link could not be parsed")
 
     def set_published_date(self, tag):
-        """Parses published date and set value"""
-        try:
-            self.published_date = tag.string
-            self.published_date_string = tag.string
-            final_time = tag.string.split(":")
-            min_sec = final_time[2]
-            seconds = min_sec[:2]
-            final_time[0] += ":" + final_time[1]
-            final_time[0] += ":" + seconds
+        """Parses show-level published date.
 
-            self.published_date = str(
-                datetime.datetime.strptime(final_time[0], "%a, %d %b %Y %H:%M:%S")
-            )
-        except AttributeError:
+        Drops the timezone and stores the naive local wall-clock as a
+        string (legacy behavior — show-level dates aren't normalized to
+        US/Eastern the way item-level dates are).
+        """
+        text = tag.string
+        if text is None:
             self.published_date = None
-        except Exception:
-            raise InvalidPodcastFeed(f"Invalid Podcast Feed, show level pubDate: {tag.string}, could not be parsed")
+            return
+        self.published_date = text
+        self.published_date_string = text
+        try:
+            parsed = _dateutil_parser.parse(text, tzinfos=_TZ_INFOS)
+            self.published_date = str(parsed.replace(tzinfo=None))
+        except (ValueError, TypeError, OverflowError, _dateutil_parser.ParserError):
+            raise InvalidPodcastFeed(
+                f"Invalid Podcast Feed, show level pubDate: {text}, could not be parsed"
+            )
 
     def set_owner(self, tag):
         """Parses owner name and email then sets value"""

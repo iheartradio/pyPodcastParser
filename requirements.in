@@ -4,5 +4,6 @@ lxml
 pluggy
 requests
 wheel
+python-dateutil
 pytz==2022.7.1
 tox==3.25.0
